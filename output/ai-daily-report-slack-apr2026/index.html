@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>日報作成をAIで全自動化する4ステップ - ウパ博士｜AI業務設計の専門家</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --brand-primary: hsl(328, 73%, 52%);
+      --brand-secondary: hsl(262, 55%, 46%);
+      --brand-gradient: linear-gradient(90deg, hsl(262, 58%, 42%), hsl(328, 75%, 56%));
+    }
+    body {
+      font-family: 'Noto Sans JP', 'Inter', sans-serif;
+      font-size: 15px;
+      line-height: 1.65;
+      -webkit-text-size-adjust: 100%;
+    }
+    .layout-column {
+      width: 100%;
+      max-width: 26rem; /* ~416px: スマホ縦読み相当の中央カラム */
+      margin-left: auto;
+      margin-right: auto;
+    }
+    @media (min-width: 480px) {
+      .layout-column { max-width: 28rem; } /* ~448px */
+    }
+    .header-gradient { background: var(--brand-gradient); }
+    .section-card {
+      background: white;
+      border-radius: 0.75rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+      padding: 1.25rem 1.25rem;
+      margin-bottom: 1.35rem;
+    }
+    /* 吹き出しの見た目は </body> 直前のブロック（Tailwind CDN より後に読み込ませる） */
+    .bubble-key { font-weight: 700; color: #dc2626; }
+    .bubble-ui { font-weight: 700; color: #111827; }
+    .toc-inline {
+      background: white;
+      border-radius: 0.75rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+      padding: 1.25rem 1.25rem;
+      margin-bottom: 1.35rem;
+    }
+    .toc-inline h2 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #1f2937;
+      margin-bottom: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .toc-inline nav > ol { list-style: none; padding: 0; margin: 0; counter-reset: toc; }
+    .toc-inline nav > ol > li { counter-increment: toc; margin-bottom: 0.7rem; line-height: 1.55; font-size: 0.9375rem; }
+    .toc-inline nav > ol > li > a { color: #374151; font-weight: 500; text-decoration: none; }
+    .toc-inline nav > ol > li > a:hover { color: var(--brand-secondary); text-decoration: underline; }
+    .toc-inline .toc-sub {
+      list-style: none;
+      padding: 0.35rem 0 0 1.5rem;
+      margin: 0;
+    }
+    .toc-inline .toc-sub li {
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.35rem;
+      font-size: 0.8125rem;
+      color: hsl(262, 48%, 36%);
+    }
+    .toc-inline .toc-sub a { color: inherit; font-weight: 400; text-decoration: none; }
+    .toc-inline .toc-sub a:hover { text-decoration: underline; color: var(--brand-secondary); }
+    .toc-inline .toc-sub .toc-sub-icon {
+      flex-shrink: 0;
+      margin-top: 0.15rem;
+      color: hsl(328, 55%, 48%);
+    }
+    .script-list {
+      margin: 1rem 0 1.25rem;
+      padding: 1rem 1rem;
+      background: hsl(250, 20%, 98%);
+      border-radius: 0.5rem;
+      border: 1px solid hsl(220, 14%, 90%);
+      font-size: 0.875rem;
+      line-height: 1.65;
+    }
+    .script-list ul, .script-list ol { margin: 0; padding-left: 1.125rem; color: #374151; }
+    .script-list li { margin-bottom: 0.65rem; }
+    .script-list a {
+      color: hsl(262, 48%, 38%);
+      font-weight: 600;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+    .script-list a:hover { color: hsl(328, 65%, 42%); }
+    .script-list .script-step-block { margin-bottom: 1.1rem; }
+    .script-list .script-step-label {
+      font-weight: 700;
+      color: #111827;
+      line-height: 1.5;
+      margin-bottom: 0.45rem;
+    }
+    .script-list .script-step-body {
+      margin: 0;
+      color: #374151;
+      line-height: 1.65;
+    }
+    .script-list .script-step-aside {
+      margin: 0.35rem 0 1.1rem;
+      padding: 0.65rem 0.75rem;
+      background: hsl(48, 100%, 97%);
+      border-radius: 0.375rem;
+      border: 1px solid hsl(45, 70%, 88%);
+      line-height: 1.65;
+    }
+    .script-list .script-step-aside .script-step-label { margin-bottom: 0.35rem; }
+    .script-prompt-wrap {
+      position: relative;
+      margin-top: 0.75rem;
+    }
+    .script-prompt-copy-btn {
+      position: absolute;
+      top: 0.45rem;
+      right: 0.45rem;
+      z-index: 2;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.35rem 0.55rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #f8fafc;
+      background: rgba(51, 65, 85, 0.95);
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      border-radius: 0.375rem;
+      cursor: pointer;
+      font-family: inherit;
+      line-height: 1.2;
+    }
+    .script-prompt-copy-btn:hover { background: rgba(71, 85, 105, 0.98); }
+    .script-prompt-copy-btn:focus-visible {
+      outline: 2px solid hsl(262, 55%, 58%);
+      outline-offset: 2px;
+    }
+    .script-prompt-copy-btn .script-prompt-copy-icon {
+      width: 0.875rem;
+      height: 0.875rem;
+      flex-shrink: 0;
+    }
+    .script-prompt-block {
+      margin: 0;
+      padding: 2.35rem 0.9rem 0.85rem 0.9rem;
+      background: #1e293b;
+      color: #f1f5f9;
+      border-radius: 0.5rem;
+      font-size: 0.8125rem;
+      line-height: 1.65;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, monospace;
+    }
+    .body-sub-heading {
+      font-size: 0.9375rem;
+      font-weight: 700;
+      color: #374151;
+      margin: 1.5rem 0 0.85rem;
+      padding-bottom: 0.35rem;
+      border-bottom: 1px solid hsl(220, 14%, 90%);
+      scroll-margin-top: 0.75rem;
+    }
+    .body-sub-heading:first-child { margin-top: 0; }
+    .script-list-title {
+      font-weight: 700;
+      color: #1f2937;
+      margin-bottom: 0.65rem;
+      display: flex;
+      align-items: center;
+      gap: 0.375rem;
+      font-size: 0.875rem;
+    }
+    .bubble-body {
+      font-size: 0.9375rem;
+      line-height: 1.7;
+      color: #1f2937;
+    }
+    .bubble-body .bubble-step-ol {
+      margin: 0.55rem 0 0.6rem;
+      padding-left: 1.35rem;
+      list-style: decimal;
+    }
+    .bubble-body .bubble-step-ol > li {
+      margin-bottom: 0.4rem;
+      padding-left: 0.2rem;
+    }
+    .bubble-body .bubble-step-ol > li:last-child { margin-bottom: 0; }
+    .bubble-body > p { margin: 0; }
+    .bubble-body-note {
+      margin-top: 0.65rem;
+      font-size: 0.875rem;
+      color: #4b5563;
+      line-height: 1.65;
+    }
+    /* 本文の章小見出し（左の縦ライン＋太字・赤紫）— 目次の「第〜章」と対応 */
+    .body-chapter-heading {
+      font-size: 1.0625rem;
+      font-weight: 700;
+      line-height: 1.45;
+      color: hsl(305, 50%, 30%);
+      border-left: 4px solid #dc2626;
+      padding-left: 0.75rem;
+      margin: 1.85rem 0 1.05rem;
+      scroll-margin-top: 0.75rem;
+    }
+    main > h2.body-chapter-heading:first-of-type {
+      margin-top: 0.5rem;
+    }
+  </style>
+</head>
+<body class="bg-slate-100 slack-daily-page">
+  <header class="header-gradient text-white py-4 md:py-5">
+    <div class="layout-column px-4">
+      <h1 class="text-base md:text-lg font-bold leading-snug">日報作成をAIで全自動化する4ステップ</h1>
+    </div>
+  </header>
+
+  <main class="layout-column px-4 py-6 md:py-8 pb-10 md:pb-12">
+    <aside class="toc-inline" aria-label="この記事の目次">
+      <h2>
+        <i data-lucide="list" class="w-4 h-4 text-[var(--brand-secondary)]"></i>
+        目次
+      </h2>
+      <nav>
+        <ol>
+          <li><a href="#sec-ch1">第1章：毎日の「日報地獄」</a></li>
+          <li>
+            <a href="#sec-ch2">第2章：自動化の4ステップ</a>
+            <ul class="toc-sub">
+              <li>
+                <i data-lucide="sparkles" class="w-3.5 h-3.5 toc-sub-icon" aria-hidden="true"></i>
+                <a href="#sec-ch2-four">4つの考え方</a>
+              </li>
+              <li>
+                <i data-lucide="sparkles" class="w-3.5 h-3.5 toc-sub-icon" aria-hidden="true"></i>
+                <a href="#sec-ch2-map">日報作成・報告の仕事に当てはめる</a>
+              </li>
+            </ul>
+          </li>
+          <li><a href="#sec-ch3">第3章：マネージャーと画面の中の小人</a></li>
+          <li><a href="#sec-ch4">第4章：ウパ博士の「本番」ーパニっくんの本音</a></li>
+          <li>
+            <a href="#sec-ch5">第5章：誰でも同じ手順で試せる「日報作成自動化ロードマップ」</a>
+            <ul class="toc-sub">
+              <li>
+                <i data-lucide="sparkles" class="w-3.5 h-3.5 toc-sub-icon" aria-hidden="true"></i>
+                <a href="#sec-ch5-1">5-1　具体例のざっくり説明</a>
+              </li>
+              <li>
+                <i data-lucide="sparkles" class="w-3.5 h-3.5 toc-sub-icon" aria-hidden="true"></i>
+                <a href="#sec-ch5-2">5-2　そもそもの準備（環境をそろえる）</a>
+              </li>
+              <li>
+                <i data-lucide="sparkles" class="w-3.5 h-3.5 toc-sub-icon" aria-hidden="true"></i>
+                <a href="#sec-ch5-3">5-3　実行手順</a>
+              </li>
+            </ul>
+          </li>
+          <li>
+            <a href="#sec-ch6">第6章：報告の自動化</a>
+            <ul class="toc-sub">
+              <li>
+                <i data-lucide="sparkles" class="w-3.5 h-3.5 toc-sub-icon" aria-hidden="true"></i>
+                <a href="#sec-ch6-slack">6-1　チャットツールへ送る方法</a>
+              </li>
+              <li>
+                <i data-lucide="sparkles" class="w-3.5 h-3.5 toc-sub-icon" aria-hidden="true"></i>
+                <a href="#sec-ch6-next">6-2　同じプロンプトを毎回使わないために</a>
+              </li>
+            </ul>
+          </li>
+        </ol>
+      </nav>
+    </aside>
+
+    <!-- 第1章 -->
+    <h2 class="body-chapter-heading" id="sec-ch1">第1章：毎日の「日報地獄」</h2>
+    <section class="section-card">
+      <div class="flex items-center gap-3 mb-6">
+        <img src="./images/パニっくん-ひどく慌てる様子-512×512-透過.png" alt="パニっくん" class="w-14 h-14 md:w-16 md:h-16 object-contain flex-shrink-0">
+        <div class="char-bubble char-bubble--from-left flex-1">
+          <p class="bubble-body">あーーーっ、もう！！今日もクタクタになるまで働いたのに、これから顧客データまとめて日報作って、チャットに報告しなきゃいけないの！？もう20時半だよ！？早く帰ってビール飲みたいのに！！</p>
+        </div>
+      </div>
+
+      <div class="flex flex-row-reverse items-center gap-3 mb-6">
+        <img src="./images/ウパ博士-真顔-512×512-透過.png" alt="ウパ博士" class="w-14 h-14 md:w-16 md:h-16 object-contain flex-shrink-0">
+        <div class="char-bubble char-bubble--from-right flex-1">
+          <p class="bubble-body">パニっくん、目が血走っていますよ。キーボードを叩く指に憎しみがこもっていますね</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3 mb-6">
+        <img src="./images/パニっくん-強く反発する-512×512-透過.png" alt="パニっくん" class="w-14 h-14 md:w-16 md:h-16 object-contain flex-shrink-0">
+        <div class="char-bubble char-bubble--from-left flex-1">
+          <p class="bubble-body">だって博士！現場の仕事が終わった後に、わざわざパソコン開いて『今日の顧客は〜』って打ち込むの、本当に苦痛なんだよ！しかもちょっとでも遅れると怒られるし…。俺は事務作業をするためにこの案件を請けたんじゃないのに！</p>
+        </div>
+      </div>
+
+      <div class="flex flex-row-reverse items-center gap-3 mb-6">
+        <img src="./images/ウパ博士-諭す-512×512-透過.png" alt="ウパ博士" class="w-14 h-14 md:w-16 md:h-16 object-contain flex-shrink-0">
+        <div class="char-bubble char-bubble--from-right flex-1">
+          <p class="bubble-body">その気持ち、痛いほど分かりますよ。実は私も昔は、毎晩ため息をつきながら日報をポチポチ打っていました。<br><br>でも今は、パソコンさえ開いていれば、私が指定した時間にAIが勝手に日報を作って、勝手にチャットに報告してくれているんです</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3 mb-6">
+        <img src="./images/パニっくん-驚き-512×512-透過.png" alt="パニっくん" class="w-14 h-14 md:w-16 md:h-16 object-contain flex-shrink-0">
+        <div class="char-bubble char-bubble--from-left flex-1">
+          <p class="bubble-body">えっ！？なにそれ！？幽霊でも雇ってんの！？</p>
+        </div>
+      </div>
+
+      <div class="flex flex-row-reverse items-center gap-3 mb-6">
+        <img src="./images/ウパ博士-標準-512×512-透過.png" alt="ウパ博士" class="w-14 h-14 md:w-16 md:h-16 object-contain flex-shrink-0">
+        <div class="char-bubble char-bubble--from-right flex-1">
+          <p class="bubble-body">いいえ、『AI』を使っただけです。実は、どんな仕事でも<span class="bubble-key">『4つのステップ』に切り分けると、AIに仕事を丸投げできる可能性がグッと高まる</span>んです</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 第2章 -->
+    <h2 class="body-chapter-heading" id="sec-ch2">第2章：自動化の4ステップ</h2>
+    <section class="section-card">
+      <div class="flex items-center gap-3 mb-6">
+        <img src="./images/パニっくん-焦り-512×512-透過.png" alt="パニっくん" class="w-14 h-14 md:w-16 md:h-16 object-contain flex-shrink-0">
+        <div class="char-bubble char-bubble--from-left flex-1">
+          <p class="bubble-body">4つのステップ…？俺、パソコンの難しい設定とか無理だよ？『えらー』って出た瞬間に泣きそうになるもん</p>
+        </div>
+      </div>
+
+      <div class="flex flex-row-reverse items-center gap-3 mb-6" id="sec-ch2-four">
+        <img src="./images/ウパ博士-諭す-512×512-透過.png" alt="ウパ博士" class="w-14 h-14 md:w-16 md:h-16 object-contain flex-shrink-0">
+        <div class="char-bubble char-bubble--from-right flex-1">
+          <p class="bubble-body">大丈夫です。小難しい知識なんて一切いりません。噛み砕いて説明しますね。仕事を自動化するには、次の4つの順番で考えるだけでいいんです</p>
+        </div>
+      </div>
+
+      <div class="script-list" aria-label="自動化の4ステップ">
+        <div class="script-list-title">
+          <i data-lucide="list-ordered" class="w-4 h-4 text-[var(--brand-secondary)]"></i>
+          4つのステップ
+        </div>
+        <ul>
+          <li><span class="bubble-ui">トリガー（きっかけ）：</span>いつ、AIに動き出してもらうか？</li>
+          <li><span class="bubble-ui">情報源（データ）：</span>AIに、何を見させればいいか？</li>
+          <li><span class="bubble-ui">処理する場所（作業場）：</span>どこで、その作業をやらせるか？</li>
+          <li><span class="bubble-ui">通知先（ゴール）：</span>出来上がったものを、どこに届けさせるか？</li>
+        </ul>
+      </div>
+
+      <div class="flex items-center gap-3 mb-6">
+        <img src="./images/パニっくん-疑っている-512×512-透過.png" alt="パニっくん" class="w-14 h-14 md:w-16 md:h-16 object-contain flex-shrink-0">
+        <div class="char-bubble char-bubble--from-left flex-1">
+          <p class="bubble-body">とりがー…？なんかピストルみたいな名前だね</p>
+        </div>
+      </div>
+
+      <div class="flex flex-row-reverse items-center gap-3 mb-6">
+        <img src="./images/ウパ博士-標準-512×512-透過.png" alt="ウパ博士" class="w-14 h-14 md:w-16 md:h-16 object-contain flex-shrink-0">
+        <div class="char-bubble char-bubble--from-right flex-1">
+          <p class="bubble-body">まさに『よーい、ドン！』のピストルです。私が日々やっている『日報作成・報告』の仕事に当てはめてみましょうか</p>
+        </div>
+      </div>
+
+      <div class="script-list" id="sec-ch2-map" aria-label="日報作成・報告の仕事への当てはめ">
+        <div class="script-list-title">
+          <i data-lucide="arrow-right-circle" class="w-4 h-4 text-[var(--brand-primary)]"></i>
+          「日報作成・報告」の仕事に当てはめると…
+        </div>
+        <ol>
+          <li><span class="bubble-ui">トリガー：</span>毎日「20時30分」になったらスタート！</li>
+          <li><span class="bubble-ui">情報源：</span>今日の顧客情報が入力されている「シート」を見る。</li>
+          <li><span class="bubble-ui">処理する場所：</span>インターネットの画面上で、AIに情報をまとめさせる。</li>
+          <li><span class="bubble-ui">通知先：</span>まとめた日報を指定したチャットに送る。</li>
+        </ol>
+      </div>
+
+      <div class="flex items-center gap-3 mb-6">
+        <img src="./images/パニっくん-驚き-512×512-透過.png" alt="パニっくん" class="w-14 h-14 md:w-16 md:h-16 object-contain flex-shrink-0">
+        <div class="char-bubble char-bubble--from-left flex-1">
+          <p class="bubble-body">おおっ！なんかこうやって整理すると、すごく簡単そうに思えてきた！でもさ、これをAIにやらせるって、具体的にどうすればいいの？</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 第3章 -->
+    <h2 class="body-chapter-heading" id="sec-ch3">第3章：マネージャーと画面の中の小人</h2>
+    <section class="section-card">
+      <div class="flex flex-row-reverse items-center gap-3 mb-6">
+        <img src="./images/ウパ博士-思考分析-512×512-透過.png" alt="ウパ博士" class="w-14 h-14 md:w-16 md:h-16 object-contain flex-shrink-0">
+        <div class="char-bubble char-bubble--from-right flex-1">
+          <p class="bubble-body">ここで登場するのが、2つの強力な秘密兵器です。<span class="bubble-key">『Claude Cowork（クロード・コワーク）』</span>と<span class="bubble-key">『Claude in Chrome（クロード・イン・クローム）』</span>です。</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3 mb-6">
+        <img src="./images/パニっくん-強く反発する-512×512-透過.png" alt="パニっくん" class="w-14 h-14 md:w-16 md:h-16 object-contain flex-shrink-0">
+        <div class="char-bubble char-bubble--from-left flex-1">
+          <p class="bubble-body">出たよ横文字！クロードなんちゃら！もう頭痛い！</p>
+        </div>
+      </div>
+
+      <div class="flex flex-row-reverse items-center gap-3 mb-6">
+        <img src="./images/ウパ博士-真顔-512×512-透過.png" alt="ウパ博士" class="w-14 h-14 md:w-16 md:h-16 object-contain flex-shrink-0">
+        <div class="char-bubble char-bubble--from-right flex-1">
+          <p class="bubble-body">ストップ、パニっくん。耳を塞がないで（笑）。難しく聞こえますが、実はただの<span class="bubble-key">『優秀なマネージャー』と『画面の中に住む小人』</span>なんです</p>
+        </div>
+      </div>
+
+      <div class="flex flex-row-reverse items-center gap-3 mb-6">
+        <img src="./images/ウパ博士-標準-512×512-透過.png" alt="ウパ博士" class="w-14 h-14 md:w-16 md:h-16 object-contain flex-shrink-0">
+        <div class="char-bubble char-bubble--from-right flex-1">
+          <p class="bubble-body">この2つを実際に使うには、大事な前提があります。どちらも、<span class="bubble-key">Claudeの有料プラン（Proプラン以上）</span>でないと使えません</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3 mb-6">
+        <img src="./images/パニっくん-焦り-512×512-透過.png" alt="パニっくん" class="w-14 h-14 md:w-16 md:h-16 object-contain flex-shrink-0">
+        <div class="char-bubble char-bubble--from-left flex-1">
+          <p class="bubble-body">なんだよ、結局タダじゃないのか……</p>
+        </div>
+      </div>
+
+      <div class="flex flex-row-reverse items-center gap-3 mb-6">
+        <img src="./images/ウパ博士-諭す-512×512-透過.png" alt="ウパ博士" class="w-14 h-14 md:w-16 md:h-16 object-contain flex-shrink-0">
+        <div class="char-bubble char-bubble--from-right flex-1">
+          <p class="bubble-body">便利な機能には、どうしてもコストがかかります。ただ、<span class="bubble-key">月額3,000円前後なら、ラーメン2〜3杯分を我慢すれば手の届く金額</span>です。<span class="bubble-key">今、世界を変えている最先端のAIを相棒にして時間を浮かせられる</span>と考えれば、安いものだと私は感じています。Claude CoworkとClaude in Chromeの威力は、これから先の説明で実感してもらえるはずです</p>
+        </div>
+      </div>
+
+      <figure class="mb-6 rounded-xl overflow-hidden border border-gray-200/80 shadow-sm bg-white">
+        <img src="./images/claude-cowork-banner.png" alt="Claude Cowork" width="1024" height="458" class="w-full h-auto block" loading="lazy" decoding="async">
+      </figure>
+
+      <div class="flex flex-row-reverse items-center gap-3 mb-6">
+        <img src="./images/ウパ博士-標準-512×512-透過.png" alt="ウパ博士" class="w-14 h-14 md:w-16 md:h-16 object-contain flex-shrink-0">
+        <div class="char-bubble char-bubble--from-right flex-1">
+          <p class="bubble-body"><span class="bubble-ui">Claude Cowork（優秀なマネージャー）</span><br><br>これは、<span class="bubble-ui">プログラミング不要</span>であなたに代わって自律的に動いてくれる<span class="bubble-key">司令塔（エージェント）</span>です。さっきの4ステップをこのマネージャーに『毎日20時半になったら、シートを見て、日報を作って、チャットに送ってね』と一回お願いするだけで、あとはスケジュール通りに全部仕切ってくれます。</p>
+        </div>
+      </div>
+
+      <figure class="mb-6 rounded-xl overflow-hidden border border-gray-200/80 shadow-sm bg-white">
+        <img src="./images/claude-in-chrome-banner.png" alt="Claude in Chrome（Beta）" width="1024" height="388" class="w-full h-auto block" loading="lazy" decoding="async">
+      </figure>
+
+      <div class="mb-6">
+        <div class="flex flex-row-reverse items-center gap-3">
+          <img src="./images/ウパ博士-思考分析-512×512-透過.png" alt="ウパ博士" class="w-14 h-14 md:w-16 md:h-16 object-contain flex-shrink-0">
+          <div class="char-bubble char-bubble--from-right flex-1">
+            <p class="bubble-body"><span class="bubble-ui">Claude in Chrome（画面の中に住む小人）</span><br><br>パニっくん、普段インターネットを見るとき<span class="bubble-ui">Google Chrome（グーグルクローム）</span>を使っていませんか？この小人は、そこにポンッと住み着いて、あなたに代わって画面を<span class="bubble-key">見て・操作する</span>お助けロボットです（※世間ではこれを「拡張機能」と呼びます）。ストアやリリースノートでは<span class="bubble-ui">Claude for Chrome</span>と書かれることもあります。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-6 space-y-6">
+        <figure class="m-0 flex flex-col items-center">
+          <div class="rounded-xl border border-gray-200/80 shadow-sm bg-white px-8 py-6 w-full max-w-sm">
+            <img src="./images/google-chrome-logo-wordmark.png" alt="Google Chrome のロゴ" width="1024" height="619" class="w-full max-w-[240px] h-auto mx-auto block object-contain" loading="lazy" decoding="async">
+          </div>
+        </figure>
+        <figure class="m-0">
+          <div class="rounded-xl overflow-hidden border border-gray-200/80 shadow-sm bg-white">
+            <img src="./images/claude-in-chrome-browser-sidebar.png" alt="Google Chrome のウィンドウ内に Claude のサイドバーが表示されている例。ツールバーの拡張機能アイコンから Claude を開き、検索画面の横で会話できる" width="1024" height="481" class="w-full h-auto block" loading="lazy" decoding="async">
+          </div>
+          <figcaption class="mt-2 text-xs text-gray-600 text-center">Google Chromeの中にClaudeが住み着いている様子</figcaption>
+        </figure>
+      </div>
+
+      <div class="flex items-center gap-3 mb-6">
+        <img src="./images/パニっくん-マジ？-512×512-透過.png" alt="パニっくん" class="w-14 h-14 md:w-16 md:h-16 object-contain flex-shrink-0">
+        <div class="char-bubble char-bubble--from-left flex-1">
+          <p class="bubble-body">えっ！？つまり、マネージャー（Cowork）が『決まった時間』に動き出して、画面の中の小人（Claude in Chrome）がシートを見て、日報の文章はマネージャーの画面に返ってきて……最後はチャットに投げる、みたいなイメージ！？</p>
+        </div>
+      </div>
+
+      <div class="flex flex-row-reverse items-center gap-3 mb-6">
+        <img src="./images/ウパ博士-諭す-512×512-透過.png" alt="ウパ博士" class="w-14 h-14 md:w-16 md:h-16 object-contain flex-shrink-0">
+        <div class="char-bubble char-bubble--from-right flex-1">
+          <p class="bubble-body">イメージとしては、だいたい合っています。細かいところまで「必ずこう」と決まっているわけではないので、あくまでイメージとして受け取ってください。……それと、私が普段やっていることはかなりマニアックなことで、全員に当てはまることじゃないんです</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 第4章 -->
+    <h2 class="body-chapter-heading" id="sec-ch4">第4章：ウパ博士の「本番」ーパニっくんの本音</h2>
+    <section class="section-card">
+      <div class="flex flex-row-reverse items-center gap-3 mb-6">
+        <img src="./images/ウパ博士-標準-512×512-透過.png" alt="ウパ博士" class="w-14 h-14 md:w-16 md:h-16 object-contain flex-shrink-0">
+        <div class="char-bubble char-bubble--from-right flex-1">
+          <div class="bubble-body">
+            <p>私がやっているのは、さっきの<span class="bubble-key">4ステップを一本につないだ自動化</span>です。</p>
+            <ol class="bubble-step-ol">
+              <li><span class="bubble-ui">トリガー：</span>毎日20時30分</li>
+              <li><span class="bubble-ui">情報源：</span>Googleスプレッドシート</li>
+              <li><span class="bubble-ui">処理：</span>Claude in ChromeとClaude Coworkの共同作業</li>
+              <li><span class="bubble-ui">通知先：</span>Slack（チャットツール）の指定したチャンネル</li>
+            </ol>
+            <p>コツは、4つに分けた流れだけでなく、<span class="bubble-key">AIが読みやすいように整えたシート</span>を用意し、<span class="bubble-key">指定した計算式で毎回同じ形の出力</span>になるよう組んでいることです。初期設定はそれなりに手間がかかりますが、<span class="bubble-key">一度仕上げればあとは自動で回る</span>ので、運用はかなり楽になります。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3 mb-6">
+        <img src="./images/パニっくん-強く反発する-512×512-透過.png" alt="パニっくん" class="w-14 h-14 md:w-16 md:h-16 object-contain flex-shrink-0">
+        <div class="char-bubble char-bubble--from-left flex-1">
+          <p class="bubble-body">待て待て待て！！そんなマニアックなことやってる人、周りにいないよ！？Googleスプレッドシートとか Slackって聞くだけで胃がキリキリする！博士の本番の話、正直あんまり参考にならないんだけど！？</p>
+        </div>
+      </div>
+
+      <div class="flex flex-row-reverse items-center gap-3 mb-6">
+        <img src="./images/ウパ博士-真顔-512×512-透過.png" alt="ウパ博士" class="w-14 h-14 md:w-16 md:h-16 object-contain flex-shrink-0">
+        <div class="char-bubble char-bubble--from-right flex-1">
+          <p class="bubble-body">……鋭いですね。そして、そのツッコミはほとんどの人の本音だと思います。なので今日は、<span class="bubble-key">誰でもすぐに試せる具体例と手順書</span>を用意しました。Claude CoworkとClaude in Chromeを、いきなり本番フルではなく、練習で使ってみるイメージです。そうやって「マネージャーに預ける感覚」と「小人に画面を見せる感覚」を、先に体に染み込ませていきましょう</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3 mb-6">
+        <img src="./images/パニっくん-マジ？-512×512-透過.png" alt="パニっくん" class="w-14 h-14 md:w-16 md:h-16 object-contain flex-shrink-0">
+        <div class="char-bubble char-bubble--from-left flex-1">
+          <p class="bubble-body">なるほど…<span class="bubble-key">まずは道具の感覚を掴む練習</span>ってことか！で、その具体例と手順は？</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 第5章 -->
+    <h2 class="body-chapter-heading" id="sec-ch5">第5章：誰でも同じ手順で試せる「日報作成自動化ロードマップ」</h2>
+    <section class="section-card">
+      <h3 class="body-sub-heading" id="sec-ch5-1">5-1. 具体例のざっくり説明</h3>
+
+      <div class="flex flex-row-reverse items-center gap-3 mb-6">
+        <img src="./images/ウパ博士-諭す-512×512-透過.png" alt="ウパ博士" class="w-14 h-14 md:w-16 md:h-16 object-contain flex-shrink-0">
+        <div class="char-bubble char-bubble--from-right flex-1">
+          <p class="bubble-body">これからやっていただく練習課題はこうです。「Claudeに、今日やったことが並んだ表（Googleスプレッドシート）を渡して、日報を書いてもらう」練習用のGoogleスプレッドシートは私が用意しておりますので、皆さんの方で用意する必要はありません</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3 mb-6">
+        <img src="./images/パニっくん-疑っている-512×512-透過.png" alt="パニっくん" class="w-14 h-14 md:w-16 md:h-16 object-contain flex-shrink-0">
+        <div class="char-bubble char-bubble--from-left flex-1">
+          <p class="bubble-body">さすが博士！！！</p>
+        </div>
+      </div>
+
+      <h3 class="body-sub-heading" id="sec-ch5-2">5-2. そもそもの準備（環境をそろえる）</h3>
+
+      <div class="flex flex-row-reverse items-center gap-3 mb-6">
+        <img src="./images/ウパ博士-標準-512×512-透過.png" alt="ウパ博士" class="w-14 h-14 md:w-16 md:h-16 object-contain flex-shrink-0">
+        <div class="char-bubble char-bubble--from-right flex-1">
+          <div class="bubble-body">
+            <p>早速やっていきたいところですが、パソコンにインストールしておく必要があるアプリがあるので、<span class="bubble-key">1つずつ準備していきましょう</span>！何も難しくないので、一つずつ<span class="bubble-key">焦らずに</span>やっていきましょう！</p>
+            <p class="bubble-body-note">＊ここから先はパソコンでの操作になります。パソコン上でこの図解を開きながら作業を進めるのがオススメです。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="script-list mb-6" aria-label="環境の準備チェックリスト">
+        <ol>
+          <li class="mb-4">
+            <span class="bubble-ui">①パソコン（macOS または Windows）の準備</span>
+          </li>
+          <li class="mb-4">
+            <span class="bubble-ui">②Google Chromeをダウンロード</span>
+            <ul class="mt-2 mb-0">
+              <li>Claude in Chrome は <span class="bubble-key">Google Chrome 専用</span>です。Google Chrome のダウンロードがお済みでない方は、下記リンクからダウンロードをお願いします。</li>
+              <li>リンク: <a href="https://www.google.com/chrome/" target="_blank" rel="noopener noreferrer">Google Chrome ダウンロード</a></li>
+            </ul>
+          </li>
+          <li class="mb-4">
+            <span class="bubble-ui">③Claude デスクトップアプリをダウンロードし、有料プラン（Pro 以上）に契約</span>
+            <p class="mt-2 mb-2">Claude Cowork の利用には、Claude デスクトップアプリと有料プランへの契約が必要です。Claude in Chrome も公式の説明どおり有料プランが必要です。まだの方は下記リンクからダウンロードと、有料プランへの契約をお願いします（お試しの場合は Pro プランをお勧めしています）。</p>
+            <ul class="mt-2 mb-0">
+              <li>リンク: <a href="https://claude.ai/download" target="_blank" rel="noopener noreferrer">Download Claude（公式ダウンロードページ）</a>
+                <figure class="my-3 mx-auto max-w-4xl">
+                  <img src="./images/claude-download-page-desktop.png" alt="Claude 公式ダウンロードページの画面。ヒーローに macOS 用のダウンロードボタンがあり、Desktop 欄に macOS・Windows・Windows (arm 64) の各ダウンロードが並んでいる" class="w-full h-auto rounded-md border border-gray-200 shadow-sm block" loading="lazy" decoding="async">
+                </figure>
+              </li>
+              <li>リンク: <a href="https://claude.com/pricing" target="_blank" rel="noopener noreferrer">Plans &amp; Pricing（Claude）</a>
+                <figure class="my-3 mx-auto max-w-4xl">
+                  <img src="./images/claude-pricing-page-pro-highlight.png" alt="Claude の料金ページ。Free・Pro・Max のプランが並び、Pro プランが赤枠で強調されている" class="w-full h-auto rounded-md border border-gray-200 shadow-sm block" loading="lazy" decoding="async">
+                </figure>
+              </li>
+            </ul>
+          </li>
+          <li class="mb-0">
+            <span class="bubble-ui">④Claude in Chromeの準備</span>
+            <figure class="my-3 mx-auto max-w-4xl">
+              <img src="./images/claude-desktop-cowork-customize-nav.png" alt="Claude デスクトップアプリの画面。上部の Cowork タブと、左サイドバーの「カスタマイズ」が赤い丸と矢印で示されている" class="w-full h-auto rounded-md border border-gray-200 shadow-sm block" loading="lazy" decoding="async">
+              <figcaption class="mt-2 text-xs text-gray-600 text-center">① 上部の Cowork を選ぶ → ② 左の「カスタマイズ」を開く</figcaption>
+            </figure>
+            <figure class="my-3 mx-auto max-w-4xl">
+              <img src="./images/claude-desktop-cowork-chrome-connector-enable.png" alt="Claude デスクトップの Cowork 画面。①左の「カスタマイズ」②「コネクタ」③デスクトップの「Claude in Chrome」④詳細パネルの「有効」トグルが、順に赤枠で示されている" class="w-full h-auto rounded-md border border-gray-200 shadow-sm block" loading="lazy" decoding="async">
+              <figcaption class="mt-2 text-xs text-gray-600 text-center">①「カスタマイズ」→ ②「コネクタ」→ ③「Claude in Chrome」を選ぶ → ④「有効」をオンにする</figcaption>
+            </figure>
+            <figure class="my-3 mx-auto max-w-4xl">
+              <img src="./images/chrome-extensions-puzzle-manage.png" alt="Google Chrome の画面。右上ツールバーのパズル型「拡張機能」アイコンと、開いたメニュー下部の「拡張機能を管理」が赤枠と矢印で示されている" class="w-full h-auto rounded-md border border-gray-200 shadow-sm block" loading="lazy" decoding="async">
+              <figcaption class="mt-2 text-xs text-gray-600 text-center">右上のパズルアイコン（拡張機能）を開き、「拡張機能を管理」を選ぶ</figcaption>
+            </figure>
+            <figure class="my-3 mx-auto max-w-4xl">
+              <img src="./images/chrome-extensions-manage-web-store-link.png" alt="Chrome の拡張機能管理ページ（chrome://extensions/）。左下の案内文のうち「Chrome ウェブストア」リンクが赤枠で強調されている" class="w-full h-auto rounded-md border border-gray-200 shadow-sm block" loading="lazy" decoding="async">
+              <figcaption class="mt-2 text-xs text-gray-600 text-center">拡張機能の管理画面で「Chrome ウェブストア」を開く</figcaption>
+            </figure>
+            <figure class="my-3 mx-auto max-w-4xl">
+              <img src="./images/chrome-web-store-claude-in-chrome-search.png" alt="Chrome ウェブストアの検索結果。検索欄に「Claude in Chrome」と入力され、公式の「Claude」拡張機能（Claude in Chrome Beta）の候補が枠で示されている" class="w-full h-auto rounded-md border border-gray-200 shadow-sm block" loading="lazy" decoding="async">
+              <figcaption class="mt-2 text-xs text-gray-600 text-center">検索で「Claude in Chrome」と入力し、公式の「Claude」拡張機能を選ぶ</figcaption>
+            </figure>
+            <figure class="my-3 mx-auto max-w-4xl">
+              <img src="./images/chrome-web-store-claude-add-to-chrome.png" alt="Chrome ウェブストアの Claude 拡張機能の製品ページ。開発元 Anthropic の表示と、右上の「Chrome に追加」ボタンが赤枠で強調されている" class="w-full h-auto rounded-md border border-gray-200 shadow-sm block" loading="lazy" decoding="async">
+              <figcaption class="mt-2 text-xs text-gray-600 text-center">「Chrome に追加」で拡張機能をインストールする</figcaption>
+            </figure>
+            <figure class="my-3 mx-auto max-w-4xl">
+              <img src="./images/chrome-claude-extension-permissions-approve.png" alt="左：Chrome の確認ダイアログで「Claude」を追加する際の権限一覧と「拡張機能を追加」ボタン（①）。右：Claude アカウント連携の確認で「承認する」ボタン（②）。矢印で①から②の流れを示している" class="w-full h-auto rounded-md border border-gray-200 shadow-sm block" loading="lazy" decoding="async">
+              <figcaption class="mt-2 text-xs text-gray-600 text-center">①「拡張機能を追加」→ ②「承認する」でアカウント連携を完了する</figcaption>
+            </figure>
+            <figure class="my-3 mx-auto max-w-4xl">
+              <img src="./images/chrome-extensions-menu-pin-claude.png" alt="Google Chrome の新しいタブ画面。右上のパズルアイコンから拡張機能メニューを開き、一覧の「Claude」の横のピン留めアイコンが赤枠で強調されている" class="w-full h-auto rounded-md border border-gray-200 shadow-sm block" loading="lazy" decoding="async">
+              <figcaption class="mt-2 text-xs text-gray-600 text-center">パズルアイコンからメニューを開き、「Claude」をピン留めしてツールバーに出す</figcaption>
+            </figure>
+          </li>
+        </ol>
+      </div>
+
+      <div class="flex items-center gap-3 mb-6">
+        <img src="./images/パニっくん-調子に乗ってる-512×512-透過.png" alt="パニっくん" class="w-14 h-14 md:w-16 md:h-16 object-contain flex-shrink-0">
+        <div class="char-bubble char-bubble--from-left flex-1">
+          <p class="bubble-body">最初は「げっ、、」って思ったけど、1つずつ潰していったらできたよ博士！！</p>
+        </div>
+      </div>
+
+      <div class="flex flex-row-reverse items-center gap-3 mb-6">
+        <img src="./images/ウパ博士-真顔-512×512-透過.png" alt="ウパ博士" class="w-14 h-14 md:w-16 md:h-16 object-contain flex-shrink-0">
+        <div class="char-bubble char-bubble--from-right flex-1">
+          <p class="bubble-body">パニっくん、頑張りましたね！これで準備は整ったので、早速やっていきましょう！！</p>
+        </div>
+      </div>
+
+      <h3 class="body-sub-heading" id="sec-ch5-3">5-3. 実行手順</h3>
+
+      <div class="flex flex-row-reverse items-center gap-3 mb-6">
+        <img src="./images/ウパ博士-思考分析-512×512-透過.png" alt="ウパ博士" class="w-14 h-14 md:w-16 md:h-16 object-contain flex-shrink-0">
+        <div class="char-bubble char-bubble--from-right flex-1">
+          <p class="bubble-body">下記のステップに従って、実際に手を動かしながらやってみましょう！</p>
+        </div>
+      </div>
+
+      <div class="script-list mb-6" aria-label="実行手順">
+        <ol>
+          <li>①Google Chromeを起動
+            <ul class="mt-2 mb-0">
+              <li>＊Claude in Chromeを起動させるためには、あらかじめGoogle Chromeを開いておく必要があります</li>
+            </ul>
+            <figure class="my-4 mx-auto max-w-3xl">
+              <img src="./images/chrome-new-tab-google.png" alt="Google Chrome の新しいタブ。中央に Google のロゴと検索バー、検索バー右側に AI モードなどのボタンが見える状態" width="1024" height="474" class="w-full h-auto rounded-md border border-gray-200 shadow-sm block" loading="lazy" decoding="async">
+              <figcaption class="mt-2 text-xs text-gray-600 text-center">Chrome を開いた状態の画面例（新しいタブ）</figcaption>
+            </figure>
+          </li>
+          <li>②Claude デスクトップアプリを開き、Coworkに切り替える</li>
+        </ol>
+        <figure class="my-4 mx-auto max-w-3xl">
+          <img src="./images/claude-desktop-cowork-tab.png" alt="Claudeデスクトップアプリで上部の「Cowork」タブが選ばれ、「タスクを片付けましょう」と表示されている画面" width="1024" height="474" class="w-full h-auto rounded-md border border-gray-200 shadow-sm block" loading="lazy" decoding="async">
+          <figcaption class="mt-2 text-xs text-gray-600 text-center">Cowork タブを選んだ状態の画面例</figcaption>
+        </figure>
+        <ol start="3">
+          <li>③次のプロンプトを<span class="bubble-key">そのままコピペ</span>します。貼り付けると、右下に<span class="bubble-key">「始めましょう」</span>というボタンが出るのでクリックする。クリックすると、プロンプトの内容に従って、Coworkが作業を開始。Coworkが示す計画・確認があれば、指示に従います。
+            <div class="script-prompt-wrap my-4">
+              <button type="button" class="script-prompt-copy-btn" id="sec-ch5-prompt-copy" aria-label="プロンプトをクリップボードにコピーする">
+                <i data-lucide="copy" class="script-prompt-copy-icon" aria-hidden="true"></i>
+                <span class="script-prompt-copy-label">コピー</span>
+              </button>
+              <pre class="script-prompt-block" id="sec-ch5-prompt"># 役割
+あなたはGoogleスプレッドシートのデータをもとに、直属の上司向けにわかりやすい業務日報を書く専門家です
+
+# GoogleスプレッドシートURL
+https://docs.google.com/spreadsheets/d/1jLeWcWGXZqk1sg2jcnoWHj0LFazURGs4QW-m4pUKr50/edit?usp=sharing
+
+# 文体
+ビジネス文書として自然な敬体（です・ます）にそろえてください。口語（例：「〜したよ」）や、カンマや括弧だけで業務を次々につなげた一続きの長文は避けてください。
+
+# 通知先
+この Cowork タスクの会話に、完成した日報の全文を返してください。
+
+# 禁止事項
+日報に名前は書かないでください
+
+# やってほしいこと
+Claude in Chrome を使って、表示中のGoogleスプレッドシートを読み取り、1行目を列見出しとし、2行目以降のデータ行のみを根拠に、職場に提出・共有できる体裁の業務日報として書き起こしてください。</pre>
+            </div>
+            <figure class="my-4 mx-auto max-w-3xl">
+              <img src="./images/cowork-task-prompt-filled.png" alt="Cowork タブで依頼文が入力され、「始めましょう」で実行できる直前の画面" width="1024" height="761" class="w-full h-auto rounded-md border border-gray-200 shadow-sm block" loading="lazy" decoding="async">
+              <figcaption class="mt-2 text-xs text-gray-600 text-center">同じ内容を Cowork に貼り付けたあとの画面例</figcaption>
+            </figure>
+          </li>
+          <li>④<span class="bubble-ui">Coworkの回答をチェック</span>
+            <figure class="my-4 mx-auto max-w-3xl">
+              <img src="./images/cowork-daily-report-response.png" alt="Cowork の会話画面に、業務日報（日付・本日の業務内容・所感・申し送り事項）が生成され、コピーなどの操作アイコンが表示されている状態" width="1024" height="815" class="w-full h-auto rounded-md border border-gray-200 shadow-sm block" loading="lazy" decoding="async">
+              <figcaption class="mt-2 text-xs text-gray-600 text-center">Cowork が日報を返したあとの画面例（実際の表示）</figcaption>
+            </figure>
+          </li>
+        </ol>
+      </div>
+
+      <div class="flex items-center gap-3 mb-6">
+        <img src="./images/パニっくん-驚き-512×512-透過.png" alt="パニっくん" class="w-14 h-14 md:w-16 md:h-16 object-contain flex-shrink-0">
+        <div class="char-bubble char-bubble--from-left flex-1">
+          <p class="bubble-body">おおおーーーー！！！博士のいった通りにやったらできたよ！！！Cowork すごい！！！！</p>
+        </div>
+      </div>
+
+      <div class="flex flex-row-reverse items-center gap-3 mb-6">
+        <img src="./images/ウパ博士-諭す-512×512-透過.png" alt="ウパ博士" class="w-14 h-14 md:w-16 md:h-16 object-contain flex-shrink-0">
+        <div class="char-bubble char-bubble--from-right flex-1">
+          <p class="bubble-body">よくできましたね。勢いはそのままで大丈夫です。一度深呼吸して、返ってきた日報を読み返してから提出すると、さらに安心ですよ。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 第6章 -->
+    <h2 class="body-chapter-heading" id="sec-ch6">第6章：報告の自動化</h2>
+    <section class="section-card">
+      <div class="flex items-center gap-3 mb-6">
+        <img src="./images/パニっくん-マジ？-512×512-透過.png" alt="パニっくん" class="w-14 h-14 md:w-16 md:h-16 object-contain flex-shrink-0">
+        <div class="char-bubble char-bubble--from-left flex-1">
+          <p class="bubble-body">待って博士！博士はチャットツールへの報告まで自動化してたじゃん。いまの練習だと日報はCoworkの画面に返ってきただけで……報告まで自動化するには、どうすればいい？</p>
+        </div>
+      </div>
+
+      <div class="flex flex-row-reverse items-center gap-3 mb-6">
+        <img src="./images/ウパ博士-標準-512×512-透過.png" alt="ウパ博士" class="w-14 h-14 md:w-16 md:h-16 object-contain flex-shrink-0">
+        <div class="char-bubble char-bubble--from-right flex-1">
+          <p class="bubble-body">いいところに気づきましたね。実際に私は<span class="bubble-key">報告まで完全自動化</span>しています。ここからは、私が普段業務で使っているチャットツール「<span class="bubble-ui">Slack</span>」を例として自動化する手順について説明していきましょう。</p>
+        </div>
+      </div>
+
+      <h3 class="body-sub-heading" id="sec-ch6-slack">6-1. チャットツールへ送る方法</h3>
+
+      <div class="flex flex-row-reverse items-center gap-3 mb-6">
+        <img src="./images/ウパ博士-思考分析-512×512-透過.png" alt="ウパ博士" class="w-14 h-14 md:w-16 md:h-16 object-contain flex-shrink-0">
+        <div class="char-bubble char-bubble--from-right flex-1">
+          <p class="bubble-body">手順は次の通りです。小難しい設定は1つもないので安心してください。</p>
+        </div>
+      </div>
+
+      <div class="script-list mb-6" aria-label="Slackへ日報を送る手順">
+        <ol>
+          <li class="mb-3"><span class="bubble-ui">①コネクタを開く</span>
+            <figure class="my-3 mx-auto max-w-4xl">
+              <img src="./images/cowork-customize-connectors-plus-annotated.png" alt="Claude デスクトップの Cowork 画面。①左サイドバーの「カスタマイズ」②「コネクタ」③コネクタ画面右上の「+」ボタンが、赤い番号と矢印で順に示されている" class="w-full h-auto rounded-md border border-gray-200 shadow-sm block" loading="lazy" decoding="async">
+            </figure>
+            <span class="bubble-ui">②Slackを選択</span>
+            <figure class="my-3 mx-auto max-w-4xl">
+              <img src="./images/cowork-connectors-directory-slack-search.png" alt="Cowork のコネクタディレクトリ画面。左で「コネクタ」が選ばれ、検索欄に「slack」と入力した状態。検索結果の「Slack インタラクティブ」カード右上の「+」追加ボタンが赤い丸で示されている" class="w-full h-auto rounded-md border border-gray-200 shadow-sm block" loading="lazy" decoding="async">
+            </figure>
+          </li>
+          <li class="mb-3"><span class="bubble-ui">③「許可する」を選択</span>
+            <figure class="my-3 mx-auto max-w-4xl">
+              <img src="./images/slack-claude-app-authorization-allow.png" alt="Slack の権限確認画面。「Claude」アプリがワークスペースにアクセスする許可を求めており、権限の説明の下にある緑色の「許可する」ボタンが赤枠で強調されている" class="w-full h-auto rounded-md border border-gray-200 shadow-sm block" loading="lazy" decoding="async">
+            </figure>
+          </li>
+          <li class="mb-0"><span class="bubble-ui">④Coworkに入力するプロンプトを修正</span>
+            <div class="script-prompt-wrap my-3">
+              <button type="button" class="script-prompt-copy-btn" id="sec-ch6-slack-prompt-copy" aria-label="プロンプトをクリップボードにコピーする">
+                <i data-lucide="copy" class="script-prompt-copy-icon" aria-hidden="true"></i>
+                <span class="script-prompt-copy-label">コピー</span>
+              </button>
+              <pre class="script-prompt-block" id="sec-ch6-slack-prompt"># 役割
+あなたはGoogleスプレッドシートのデータをもとに、直属の上司向けにわかりやすい業務日報を書く専門家です
+
+# GoogleスプレッドシートURL
+https://docs.google.com/spreadsheets/d/1jLeWcWGXZqk1sg2jcnoWHj0LFazURGs4QW-m4pUKr50/edit?usp=sharing
+
+# 文体
+ビジネス文書として自然な敬体（です・ます）にそろえてください。口語（例：「〜したよ」）や、カンマや括弧だけで業務を次々につなげた一続きの長文は避けてください。
+
+# 通知先
+「Slackの⚪︎⚪︎チャンネル」に、完成した日報の全文を返してください。
+
+# 禁止事項
+日報に名前は書かないでください
+
+# やってほしいこと
+Claude in Chrome を使って、表示中のGoogleスプレッドシートを読み取り、1行目を列見出しとし、2行目以降のデータ行のみを根拠に、職場に提出・共有できる体裁の業務日報として書き起こしてください。</pre>
+            </div>
+          </li>
+        </ol>
+      </div>
+
+      <div class="flex items-center gap-3 mb-6">
+        <img src="./images/パニっくん-標準-512×512-透過.png" alt="パニっくん" class="w-14 h-14 md:w-16 md:h-16 object-contain flex-shrink-0">
+        <div class="char-bubble char-bubble--from-left flex-1">
+          <p class="bubble-body">なるほど、<span class="bubble-key">思った以上に簡単</span>だ。これならできそう！！！</p>
+        </div>
+      </div>
+
+      <div class="flex flex-row-reverse items-center gap-3 mb-6">
+        <img src="./images/ウパ博士-諭す-512×512-透過.png" alt="ウパ博士" class="w-14 h-14 md:w-16 md:h-16 object-contain flex-shrink-0">
+        <div class="char-bubble char-bubble--from-right flex-1">
+          <p class="bubble-body">その通りです。「AIで自動化」と聞くと身構えてしまいますが、<span class="bubble-key">何一つ難しいことはありません。1つ1つ進めていけば誰でもできるようになります。</span></p>
+        </div>
+      </div>
+
+      <h3 class="body-sub-heading" id="sec-ch6-next">6-2. 同じプロンプトを毎回使わないために</h3>
+
+      <div class="flex items-center gap-3 mb-6">
+        <img src="./images/パニっくん-涙ぐむ-512×512-透過.png" alt="パニっくん" class="w-14 h-14 md:w-16 md:h-16 object-contain flex-shrink-0">
+        <div class="char-bubble char-bubble--from-left flex-1">
+          <p class="bubble-body">でもさあ……<span class="bubble-key">あの長い依頼文、毎回コピペするのも地味にしんどい</span>よ、、、、何かいい方法はないの？？</p>
+        </div>
+      </div>
+
+      <div class="flex flex-row-reverse items-center gap-3 mb-0">
+        <img src="./images/ウパ博士-諭す-512×512-透過.png" alt="ウパ博士" class="w-14 h-14 md:w-16 md:h-16 object-contain flex-shrink-0">
+        <div class="char-bubble char-bubble--from-right flex-1">
+          <p class="bubble-body">そうですよね。確かに<span class="bubble-key">毎回長文のプロンプトを入力するのは面倒くさい</span>です。そんな時は、<span class="bubble-key">「スキル」</span>というAIへの指示書にまとめておく方法があります。ただ、今日紹介すると、情報量が多くなりすぎて、何がなんだかわからなくなってしまうと思うので、今日はここまでにしましょう！「スキル」については今後の無料特典で触れていくので、ご安心ください。</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3 mb-6 mt-6">
+        <img src="./images/パニっくん-標準-512×512-透過.png" alt="パニっくん" class="w-14 h-14 md:w-16 md:h-16 object-contain flex-shrink-0">
+        <div class="char-bubble char-bubble--from-left flex-1">
+          <p class="bubble-body">わかった！！！今日だけでも随分多くのことができるようになったし、、、俺これからも博士についていくよ！！！！！</p>
+        </div>
+      </div>
+
+      <div class="flex flex-row-reverse items-center gap-3 mb-0">
+        <img src="./images/ウパ博士-標準-512×512-透過.png" alt="ウパ博士" class="w-14 h-14 md:w-16 md:h-16 object-contain flex-shrink-0">
+        <div class="char-bubble char-bubble--from-right flex-1">
+          <p class="bubble-body">ふふ、その意気ですね、パニっくん。今日ここまでできたなら、<span class="bubble-key">もう十分、立派な一歩です。</span>迷ったら立ち止まって大丈夫。私も、これからもそばで応援していますから。</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <style>
+    /**
+     * 吹き出し（対話）
+     * - Tailwind CDN は実行時に <style> を挿入するため、同じ <head> 内のルールより後に勝つことがある。
+     * - ここを </body> 直前に置き、.slack-daily-page でスコープして確実に適用する。
+     * - しっぽは左右とも縦中央（上寄り＝ダメ例）。白＋細い中立ボーダーがしっぽまで続くよう二重三角。
+     */
+    .slack-daily-page .char-bubble {
+      position: relative;
+      padding: 0.9rem 1rem;
+      border-radius: 1rem;
+      background: #ffffff;
+      border: 1px solid hsl(220, 14%, 82%);
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+      overflow: visible;
+    }
+    .slack-daily-page .char-bubble--from-left { margin-left: 0.65rem; }
+    .slack-daily-page .char-bubble--from-right { margin-right: 0.65rem; }
+    .slack-daily-page .char-bubble--from-left::before,
+    .slack-daily-page .char-bubble--from-left::after,
+    .slack-daily-page .char-bubble--from-right::before,
+    .slack-daily-page .char-bubble--from-right::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: 0;
+      height: 0;
+      border-style: solid;
+      pointer-events: none;
+    }
+    .slack-daily-page .char-bubble--from-left::before {
+      left: -12px;
+      transform: translateY(-50%);
+      border-width: 9px 11px 9px 0;
+      border-color: transparent hsl(220, 14%, 82%) transparent transparent;
+    }
+    .slack-daily-page .char-bubble--from-left::after {
+      left: -10px;
+      transform: translateY(-50%);
+      border-width: 8px 10px 8px 0;
+      border-color: transparent #ffffff transparent transparent;
+      z-index: 1;
+    }
+    .slack-daily-page .char-bubble--from-right::before {
+      right: -12px;
+      left: auto;
+      transform: translateY(-50%);
+      border-width: 9px 0 9px 11px;
+      border-color: transparent transparent transparent hsl(220, 14%, 82%);
+    }
+    .slack-daily-page .char-bubble--from-right::after {
+      right: -10px;
+      left: auto;
+      transform: translateY(-50%);
+      border-width: 8px 0 8px 10px;
+      border-color: transparent transparent transparent #ffffff;
+      z-index: 1;
+    }
+  </style>
+  <script>
+    lucide.createIcons();
+    (function () {
+      function bindCopy(btnId, preId) {
+        var btn = document.getElementById(btnId);
+        var pre = document.getElementById(preId);
+        if (!btn || !pre) return;
+        var label = btn.querySelector('.script-prompt-copy-label');
+        var defaultLabel = label ? label.textContent : 'コピー';
+        btn.addEventListener('click', function () {
+          var text = pre.textContent;
+          function showMsg(msg) {
+            if (!label) return;
+            label.textContent = msg;
+            setTimeout(function () { label.textContent = defaultLabel; }, 2000);
+          }
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(function () {
+              showMsg('コピーしました');
+            }).catch(function () {
+              showMsg('コピーに失敗しました');
+            });
+          } else {
+            try {
+              var ta = document.createElement('textarea');
+              ta.value = text;
+              ta.setAttribute('readonly', '');
+              ta.style.position = 'fixed';
+              ta.style.left = '-9999px';
+              document.body.appendChild(ta);
+              ta.select();
+              document.execCommand('copy');
+              document.body.removeChild(ta);
+              showMsg('コピーしました');
+            } catch (e) {
+              showMsg('コピーに失敗しました');
+            }
+          }
+        });
+      }
+      bindCopy('sec-ch5-prompt-copy', 'sec-ch5-prompt');
+      bindCopy('sec-ch6-slack-prompt-copy', 'sec-ch6-slack-prompt');
+    })();
+  </script>
+</body>
+</html>

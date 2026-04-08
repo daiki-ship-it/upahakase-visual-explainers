@@ -1,0 +1,26 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Preview: AI日報×Slack（surge）",
+      "type": "shell",
+      "command": "echo ${input:openAiDailyReportSurge}",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "never",
+        "echo": false,
+        "focus": false,
+        "panel": "shared",
+        "close": true
+      }
+    }
+  ],
+  "inputs": [
+    {
+      "id": "openAiDailyReportSurge",
+      "type": "command",
+      "command": "simpleBrowser.show",
+      "args": ["https://upa-ai-daily-slack-apr2026.surge.sh/"]
+    }
+  ]
+}
