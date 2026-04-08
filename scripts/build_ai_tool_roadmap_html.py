@@ -259,6 +259,12 @@ HEAD = """<!DOCTYPE html>
       font-size: 1rem;
       color: #374151;
     }
+    .gift-list .gift-item-wrap { flex: 1; min-width: 0; }
+    .gift-list .gift-item-desc {
+      display: block;
+      margin-top: 0.35rem;
+      line-height: 1.65;
+    }
   </style>
 </head>
 <body class="bg-gray-50">
@@ -380,11 +386,11 @@ def gifts_bubble(titles_descs: list[tuple[str, str]], img: str) -> str:
         d_esc = md_to_inline_html(desc) if desc else ""
         body = f'<span class="bubble-ui">{t_esc}</span>'
         if d_esc:
-            body += f"——{d_esc}"
+            body += f'<br><span class="gift-item-desc">——{d_esc}</span>'
         lis.append(
             f"""            <li>
               <i data-lucide="gift" class="w-5 h-5 text-[var(--brand-secondary)] flex-shrink-0 mt-0.5" aria-hidden="true"></i>
-              <span>{body}</span>
+              <span class="gift-item-wrap">{body}</span>
             </li>"""
         )
     ul = "\n".join(lis)
