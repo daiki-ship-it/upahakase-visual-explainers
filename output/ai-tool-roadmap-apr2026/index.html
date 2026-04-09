@@ -5,91 +5,121 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AIツール迷子からの脱却ロードマップ - ウパ博士｜AI業務設計の専門家</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --brand-primary: hsl(328, 73%, 52%);
-      --brand-secondary: hsl(262, 55%, 46%);
-      --brand-gradient: linear-gradient(90deg, hsl(262, 58%, 42%), hsl(328, 75%, 56%));
+      --brand-primary: hsl(188, 65%, 38%);
+      --brand-secondary: hsl(198, 58%, 34%);
+      --brand-gradient: linear-gradient(90deg, hsl(201, 72%, 34%), hsl(186, 68%, 42%));
+      --surface-bg: hsl(192, 45%, 99.4%);
     }
-    body { font-family: 'Noto Sans JP', 'Inter', sans-serif; }
+    body {
+      font-family: 'Noto Sans JP', 'Inter', sans-serif;
+      font-size: 15px;
+      line-height: 1.65;
+      -webkit-text-size-adjust: 100%;
+    }
+    .layout-column {
+      width: 100%;
+      max-width: 26rem;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    @media (min-width: 480px) {
+      .layout-column { max-width: 28rem; }
+    }
     .header-gradient { background: var(--brand-gradient); }
     .section-card {
-      background: white;
-      border-radius: 1rem;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-      padding: 2rem;
-      margin-bottom: 2rem;
+      background: var(--surface-bg);
+      border-radius: 0.75rem;
+      box-shadow: 0 1px 3px rgba(12, 60, 75, 0.09);
+      padding: 1.45rem 1.35rem;
+      margin-bottom: 1.35rem;
     }
-    .char-bubble {
-      position: relative;
-      padding: 1.5rem;
-      border-radius: 1rem;
-      background: #ffffff;
-      border: 1px solid hsl(220, 14%, 82%);
-      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
-    }
-    .char-bubble::before {
-      content: '';
-      position: absolute;
-      top: 20px;
-      border-width: 10px;
-      border-style: solid;
-    }
-    .char-bubble--from-left { margin-left: 1rem; }
-    .char-bubble--from-left::before {
-      left: -10px;
-      border-color: transparent hsl(220, 14%, 82%) transparent transparent;
-    }
-    .char-bubble--from-right { margin-right: 1rem; }
-    .char-bubble--from-right::before {
-      right: -10px;
-      left: auto;
-      border-color: transparent transparent transparent hsl(220, 14%, 82%);
-    }
+    /* 吹き出しの見た目は </body> 直前のブロック（Tailwind CDN より後に読み込ませる） */
     .bubble-key { font-weight: 700; color: #dc2626; }
     .bubble-ui { font-weight: 700; color: #111827; }
     .toc-inline {
-      background: white;
-      border-radius: 1rem;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-      padding: 1.75rem 2rem;
-      margin-bottom: 2rem;
+      background: var(--surface-bg);
+      border-radius: 0.75rem;
+      box-shadow: 0 1px 3px rgba(12, 60, 75, 0.09);
+      padding: 1.45rem 1.35rem;
+      margin-bottom: 1.35rem;
     }
     .toc-inline h2 {
-      font-size: 1.25rem;
+      font-size: 1rem;
       font-weight: 700;
       color: #1f2937;
-      margin-bottom: 1.25rem;
+      margin-bottom: 0.9rem;
       display: flex;
       align-items: center;
       gap: 0.5rem;
     }
     .toc-inline nav > ol { list-style: none; padding: 0; margin: 0; counter-reset: toc; }
-    .toc-inline nav > ol > li { counter-increment: toc; margin-bottom: 0.85rem; line-height: 1.5; }
-    .toc-inline nav > ol > li > a { color: #374151; font-weight: 500; text-decoration: none; }
+    .toc-inline nav > ol > li { counter-increment: toc; margin-bottom: 0.7rem; line-height: 1.55; font-size: 0.9375rem; }
+    .toc-inline nav > ol > li > a {
+      color: #374151;
+      font-weight: 500;
+      text-decoration: none;
+      display: block;
+      padding: 0.4rem 0.2rem;
+      margin: -0.15rem 0;
+      border-radius: 0.25rem;
+    }
     .toc-inline nav > ol > li > a:hover { color: var(--brand-secondary); text-decoration: underline; }
+    .toc-inline nav > ol > li > a:focus-visible,
+    .toc-inline .toc-sub a:focus-visible {
+      outline: 2px solid hsl(192, 58%, 48%);
+      outline-offset: 2px;
+    }
     .toc-inline .toc-sub {
       list-style: none;
       padding: 0.35rem 0 0 1.5rem;
       margin: 0;
     }
     .toc-inline .toc-sub li {
-      margin-bottom: 0.4rem;
+      margin-bottom: 0.5rem;
       display: flex;
       align-items: flex-start;
       gap: 0.35rem;
-      font-size: 0.9375rem;
-      color: hsl(262, 48%, 36%);
+      font-size: 0.8125rem;
+      color: hsl(198, 42%, 30%);
     }
-    .toc-inline .toc-sub a { color: inherit; font-weight: 400; text-decoration: none; }
+    .toc-inline .toc-sub a {
+      color: inherit;
+      font-weight: 400;
+      text-decoration: none;
+      display: block;
+      padding: 0.35rem 0.15rem;
+      margin: -0.1rem 0;
+      border-radius: 0.25rem;
+    }
     .toc-inline .toc-sub a:hover { text-decoration: underline; color: var(--brand-secondary); }
     .toc-inline .toc-sub .toc-sub-icon {
       flex-shrink: 0;
       margin-top: 0.15rem;
-      color: hsl(328, 55%, 48%);
+      color: hsl(188, 55%, 42%);
+    }
+    .bubble-body {
+      font-size: 0.9375rem;
+      line-height: 1.7;
+      color: #1f2937;
+    }
+    .bubble-body > p { margin: 0; }
+    .body-chapter-heading {
+      font-size: 1.0625rem;
+      font-weight: 700;
+      line-height: 1.45;
+      color: hsl(198, 48%, 26%);
+      border-left: 4px solid #dc2626;
+      padding-left: 0.75rem;
+      margin: 1.85rem 0 1.05rem;
+      scroll-margin-top: 0.75rem;
+    }
+    main > h2.body-chapter-heading:first-of-type {
+      margin-top: 0.5rem;
     }
     .gift-list { margin-top: 0.75rem; padding-left: 0; list-style: none; }
     .gift-list li {
@@ -97,7 +127,8 @@
       gap: 0.5rem;
       align-items: flex-start;
       margin-bottom: 0.65rem;
-      font-size: 1rem;
+      font-size: 0.875rem;
+      line-height: 1.65;
       color: #374151;
     }
     .gift-list .gift-item-wrap { flex: 1; min-width: 0; }
@@ -108,18 +139,18 @@
     }
   </style>
 </head>
-<body class="bg-gray-50">
-  <header class="header-gradient text-white py-8">
-    <div class="max-w-4xl mx-auto px-4">
-      <h1 class="text-2xl md:text-4xl font-bold leading-tight">AIツール迷子からの脱却ロードマップ</h1>
-      <p class="mt-2 text-lg opacity-90">たった5分で読める——「AIを使いこなせない」根本原因と、ツール選びの考え方</p>
+<body class="bg-slate-50 slack-daily-page">
+  <header class="header-gradient text-white py-4 md:py-5">
+    <div class="layout-column px-4">
+      <h1 class="text-base md:text-lg font-bold leading-snug">AIツール迷子からの脱却ロードマップ</h1>
+      <p class="mt-1.5 text-xs md:text-sm opacity-90 leading-relaxed">たった5分で読める——「AIを使いこなせない」根本原因と、ツール選びの考え方</p>
     </div>
   </header>
 
-  <main class="max-w-4xl mx-auto px-4 py-8">
+  <main class="layout-column px-4 py-6 md:py-8 pb-10 md:pb-12">
     <aside class="toc-inline" aria-label="この記事の目次">
       <h2>
-        <i data-lucide="list" class="w-6 h-6 text-[var(--brand-secondary)]"></i>
+        <i data-lucide="list" class="w-4 h-4 text-[var(--brand-secondary)]" aria-hidden="true"></i>
         目次
       </h2>
       <nav>
@@ -128,15 +159,15 @@
             <a href="#sec-ch1">第1章：なぜ「AIツール迷子」になるのか</a>
             <ul class="toc-sub">
               <li>
-                <i data-lucide="sparkles" class="w-4 h-4 toc-sub-icon" aria-hidden="true"></i>
+                <i data-lucide="sparkles" class="w-3.5 h-3.5 toc-sub-icon" aria-hidden="true"></i>
                 <a href="#sec-ch1-r1">① 言葉を数字のパズルにする</a>
               </li>
               <li>
-                <i data-lucide="sparkles" class="w-4 h-4 toc-sub-icon" aria-hidden="true"></i>
+                <i data-lucide="sparkles" class="w-3.5 h-3.5 toc-sub-icon" aria-hidden="true"></i>
                 <a href="#sec-ch1-r2">② 最初と最後に注意（アテンション）</a>
               </li>
               <li>
-                <i data-lucide="sparkles" class="w-4 h-4 toc-sub-icon" aria-hidden="true"></i>
+                <i data-lucide="sparkles" class="w-3.5 h-3.5 toc-sub-icon" aria-hidden="true"></i>
                 <a href="#sec-ch1-r3">③ 次の言葉をドミノのように予測</a>
               </li>
             </ul>
@@ -146,11 +177,11 @@
             <a href="#sec-ch3">第3章：2つのツールに絞る理由と選び方</a>
             <ul class="toc-sub">
               <li>
-                <i data-lucide="sparkles" class="w-4 h-4 toc-sub-icon" aria-hidden="true"></i>
+                <i data-lucide="sparkles" class="w-3.5 h-3.5 toc-sub-icon" aria-hidden="true"></i>
                 <a href="#sec-ch3-gemini">最初のステップ：Gemini</a>
               </li>
               <li>
-                <i data-lucide="sparkles" class="w-4 h-4 toc-sub-icon" aria-hidden="true"></i>
+                <i data-lucide="sparkles" class="w-3.5 h-3.5 toc-sub-icon" aria-hidden="true"></i>
                 <a href="#sec-ch3-claude">次のステップ：Claude</a>
               </li>
             </ul>
@@ -159,11 +190,11 @@
             <a href="#sec-ch4">第4章：言語化力・分解力と伴走</a>
             <ul class="toc-sub">
               <li>
-                <i data-lucide="sparkles" class="w-4 h-4 toc-sub-icon" aria-hidden="true"></i>
+                <i data-lucide="sparkles" class="w-3.5 h-3.5 toc-sub-icon" aria-hidden="true"></i>
                 <a href="#sec-ch4-cowork">Coworkで一気通貫</a>
               </li>
               <li>
-                <i data-lucide="sparkles" class="w-4 h-4 toc-sub-icon" aria-hidden="true"></i>
+                <i data-lucide="sparkles" class="w-3.5 h-3.5 toc-sub-icon" aria-hidden="true"></i>
                 <a href="#sec-ch4-gifts">無料プレゼント（4弾）</a>
               </li>
             </ul>
@@ -172,423 +203,607 @@
       </nav>
     </aside>
 
-    <section class="section-card" id="sec-ch1">
-      <div class="flex items-start gap-4 mb-6">
-        <img src="./images/パニっくん-ひどく慌てる様子-512×512-透過.png" alt="パニっくん" class="w-20 h-20 object-contain flex-shrink-0">
+    <h2 class="body-chapter-heading" id="sec-ch1">第1章：なぜ「AIツール迷子」になるのか</h2>
+    <section class="section-card">
+      <div class="flex items-start gap-4 mb-8">
+        <div class="char-stack char-stack--panik">
+          <img src="./images/パニっくん-ひどく慌てている-512×512-透過.png" alt="パニっくん" class="char-avatar" width="80" height="80" loading="eager" fetchpriority="high" decoding="async">
+          <p class="char-name">パニっくん</p>
+        </div>
         <div class="char-bubble char-bubble--from-left flex-1">
-          <p class="text-lg text-gray-800">あーーーっ、もう！！また新しいAIツールが出たの！？『これからはAIの時代！』って言われてるから、焦って新しいツールにどんどん課金してるのに、結局俺の普段の仕事にどう使えばいいか、全っ然わからないよ！！</p>
+          <p class="bubble-body">あーーーっ、もう！！また新しいAIツールが出たの！？『これからはAIの時代！』って言われてるから、焦って新しいツールにどんどん課金してるのに、結局俺の普段の仕事にどう使えばいいか、全っ然わからないよ！！</p>
         </div>
       </div>
 
-      <div class="flex flex-row-reverse items-start gap-4 mb-6">
-        <img src="./images/ウパ博士-諭す-512×512-透過.png" alt="ウパ博士" class="w-20 h-20 object-contain flex-shrink-0">
+      <div class="flex flex-row-reverse items-start gap-4 mb-8">
+        <div class="char-stack char-stack--upa">
+        <img src="./images/ウパ博士-諭す-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">ウパ博士</p>
+        </div>
         <div class="char-bubble char-bubble--from-right flex-1">
-          <p class="text-lg text-gray-800">パニっくん、落ち着いて。スマホの画面をタップする指が震えていますよ</p>
+          <p class="bubble-body">パニっくん、落ち着いて。スマホの画面をタップする指が震えていますよ</p>
         </div>
       </div>
 
-      <div class="flex items-start gap-4 mb-6">
-        <img src="./images/パニっくん-涙ぐむ-512×512-透過.png" alt="パニっくん" class="w-20 h-20 object-contain flex-shrink-0">
+      <div class="flex items-start gap-4 mb-8">
+        <div class="char-stack char-stack--panik">
+        <img src="./images/パニっくん-涙ぐむ-512×512-透過.png" alt="パニっくん" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">パニっくん</p>
+        </div>
         <div class="char-bubble char-bubble--from-left flex-1">
-          <p class="text-lg text-gray-800">だって博士！俺、今までAI系の教材に100万円くらい投資してきたのに、ITとかパソコンが苦手すぎて、結局『何が分からないかが分からない』状態なんだよ…。現場の仕事で毎日クタクタなのに、このままじゃAIに仕事奪われて、時代に置いてけぼりにされそうで怖いんだよぉ…！</p>
+          <p class="bubble-body">だって博士！俺、今までAI系の教材に100万円くらい投資してきたのに、ITとかパソコンが苦手すぎて、結局『何が分からないかが分からない』状態なんだよ…。現場の仕事で毎日クタクタなのに、このままじゃAIに仕事奪われて、時代に置いてけぼりにされそうで怖いんだよぉ…！</p>
         </div>
       </div>
 
-      <div class="flex flex-row-reverse items-start gap-4 mb-6">
-        <img src="./images/ウパ博士-標準-512×512-透過.png" alt="ウパ博士" class="w-20 h-20 object-contain flex-shrink-0">
+      <div class="flex flex-row-reverse items-start gap-4 mb-8">
+        <div class="char-stack char-stack--upa">
+        <img src="./images/ウパ博士-標準-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">ウパ博士</p>
+        </div>
         <div class="char-bubble char-bubble--from-right flex-1">
-          <p class="text-lg text-gray-800">その強烈な焦り、痛いほどよくわかります。実は私自身も、1年前は片っ端から新しいツールに課金しては挫折する、ただの『AIツール迷子』だったんです</p>
+          <p class="bubble-body">その強烈な焦り、痛いほどよくわかります。実は私自身も、1年前は片っ端から新しいツールに課金しては挫折する、ただの『AIツール迷子』だったんです</p>
         </div>
       </div>
 
-      <div class="flex items-start gap-4 mb-6">
-        <img src="./images/パニっくん-驚き-512×512-透過.png" alt="パニっくん" class="w-20 h-20 object-contain flex-shrink-0">
+      <div class="flex items-start gap-4 mb-8">
+        <div class="char-stack char-stack--panik">
+        <img src="./images/パニっくん-驚き-512×512-透過.png" alt="パニっくん" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">パニっくん</p>
+        </div>
         <div class="char-bubble char-bubble--from-left flex-1">
-          <p class="text-lg text-gray-800">えっ、ウパ博士が！？でも今は、1000人規模のAIイベントで表彰されたり、非ITの現場にAIを導入して30分以上あった残業時間を0にしただけでなく、月収を20万円以上もアップさせたりしてる大先生でしょ？</p>
+          <p class="bubble-body">えっ、ウパ博士が！？でも今は、1000人規模のAIイベントで表彰されたり、非ITの現場にAIを導入して30分以上あった残業時間を0にしただけでなく、月収を20万円以上もアップさせたりしてる大先生でしょ？</p>
         </div>
       </div>
 
-      <div class="flex flex-row-reverse items-start gap-4 mb-6">
-        <img src="./images/ウパ博士-思考分析-512×512-透過.png" alt="ウパ博士" class="w-20 h-20 object-contain flex-shrink-0">
+      <div class="flex flex-row-reverse items-start gap-4 mb-8">
+        <div class="char-stack char-stack--upa">
+        <img src="./images/ウパ博士-思考、分析-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">ウパ博士</p>
+        </div>
         <div class="char-bubble char-bubble--from-right flex-1">
-          <p class="text-lg text-gray-800">大先生だなんてとんでもない（笑）。でも、どん底から抜け出せた理由はたった1つ。最新ツールを追うのをやめて、『AIの原理原則（根本的な仕組み）』から学び直したからです</p>
+          <p class="bubble-body">大先生だなんてとんでもない（笑）。でも、どん底から抜け出せた理由はたった1つ。最新ツールを追うのをやめて、『AIの原理原則（根本的な仕組み）』から学び直したからです</p>
         </div>
       </div>
 
-      <div class="flex items-start gap-4 mb-6">
-        <img src="./images/パニっくん-疑っている-512×512-透過.png" alt="パニっくん" class="w-20 h-20 object-contain flex-shrink-0">
+      <div class="flex items-start gap-4 mb-8">
+        <div class="char-stack char-stack--panik">
+        <img src="./images/パニっくん-疑っている-512×512-透過.png" alt="パニっくん" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">パニっくん</p>
+        </div>
         <div class="char-bubble char-bubble--from-left flex-1">
-          <p class="text-lg text-gray-800">げんりげんそく…？出たな難しい言葉。俺、スマホの予測変換ですらたまにパニックになるレベルなんだけど…</p>
+          <p class="bubble-body">げんりげんそく…？出たな難しい言葉。俺、スマホの予測変換ですらたまにパニックになるレベルなんだけど…</p>
         </div>
       </div>
 
-      <div class="flex flex-row-reverse items-start gap-4 mb-6">
-        <img src="./images/ウパ博士-真顔-512×512-透過.png" alt="ウパ博士" class="w-20 h-20 object-contain flex-shrink-0">
+      <div class="flex flex-row-reverse items-start gap-4 mb-8">
+        <div class="char-stack char-stack--upa">
+        <img src="./images/ウパ博士-真顔-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">ウパ博士</p>
+        </div>
         <div class="char-bubble char-bubble--from-right flex-1">
-          <p class="text-lg text-gray-800">安心してください。専門用語は一切使わずに説明しますね。パニっくんがAIを使いこなせないのは、IT音痴だからじゃない。『AIがどうやって言葉を理解し、答えを出しているか』というルールを知らないだけなんです。実は、AIって言葉の意味なんて全く理解してないんですよ</p>
+          <p class="bubble-body">安心してください。専門用語は一切使わずに説明しますね。パニっくんがAIを使いこなせないのは、IT音痴だからじゃない。『AIがどうやって言葉を理解し、答えを出しているか』というルールを知らないだけなんです。実は、AIって言葉の意味なんて全く理解してないんですよ</p>
         </div>
       </div>
 
-      <div class="flex items-start gap-4 mb-6">
-        <img src="./images/パニっくん-マジ？-512×512-透過.png" alt="パニっくん" class="w-20 h-20 object-contain flex-shrink-0">
+      <div class="flex items-start gap-4 mb-8">
+        <div class="char-stack char-stack--panik">
+        <img src="./images/パニっくん-マジ？-512×512-透過.png" alt="パニっくん" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">パニっくん</p>
+        </div>
         <div class="char-bubble char-bubble--from-left flex-1">
-          <p class="text-lg text-gray-800">えっ！？意味分かってないの！？じゃあなんであんなに賢そうに喋るのさ！</p>
+          <p class="bubble-body">えっ！？意味分かってないの！？じゃあなんであんなに賢そうに喋るのさ！</p>
         </div>
       </div>
 
-      <div class="flex flex-row-reverse items-start gap-4 mb-6">
-        <img src="./images/ウパ博士-諭す-512×512-透過.png" alt="ウパ博士" class="w-20 h-20 object-contain flex-shrink-0">
+      <div class="flex flex-row-reverse items-start gap-4 mb-8">
+        <div class="char-stack char-stack--upa">
+        <img src="./images/ウパ博士-諭す-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">ウパ博士</p>
+        </div>
         <div class="char-bubble char-bubble--from-right flex-1">
-          <p class="text-lg text-gray-800">そこが面白いところです。AIの頭の中は、大きく3つのルールで動いています。これを知るだけで、明日からのAIへの『指示（プロンプト）』が劇的に変わりますよ</p>
+          <p class="bubble-body">そこが面白いところです。AIの頭の中は、大きく3つのルールで動いています。これを知るだけで、明日からのAIへの『指示（プロンプト）』が劇的に変わりますよ</p>
         </div>
       </div>
 
-      <div class="flex flex-row-reverse items-start gap-4 mb-6" id="sec-ch1-r1">
-        <img src="./images/ウパ博士-標準-512×512-透過.png" alt="ウパ博士" class="w-20 h-20 object-contain flex-shrink-0">
+      <div class="flex flex-row-reverse items-start gap-4 mb-8" id="sec-ch1-r1">
+        <div class="char-stack char-stack--upa">
+        <img src="./images/ウパ博士-標準-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">ウパ博士</p>
+        </div>
         <div class="char-bubble char-bubble--from-right flex-1">
-          <p class="text-lg text-gray-800"><span class="bubble-ui">① 言葉をバラバラの「数字のパズル」にする</span>——まず、AIは『おはよう』という言葉をそのまま読めず、『お・は・よう』のように細かく切り刻んで、数字に置き換えます。意味ではなく、数字のデータとして捉えているんです</p>
+          <p class="bubble-body"><span class="bubble-ui">① 言葉をバラバラの「数字のパズル」にする</span>——まず、AIは『おはよう』という言葉をそのまま読めず、『お・は・よう』のように細かく切り刻んで、数字に置き換えます。意味ではなく、数字のデータとして捉えているんです</p>
         </div>
       </div>
 
-      <div class="flex items-start gap-4 mb-6">
-        <img src="./images/パニっくん-標準-512×512-透過.png" alt="パニっくん" class="w-20 h-20 object-contain flex-shrink-0">
+      <div class="flex items-start gap-4 mb-8">
+        <div class="char-stack char-stack--panik">
+        <img src="./images/パニっくん-標準-512×512-透過.png" alt="パニっくん" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">パニっくん</p>
+        </div>
         <div class="char-bubble char-bubble--from-left flex-1">
-          <p class="text-lg text-gray-800">言葉を数字のパズルにして計算してるんだね。ってことは、本当に『おはよう』ってどういう意味なのか、心では全く分かってないってこと！？</p>
+          <p class="bubble-body">言葉を数字のパズルにして計算してるんだね。ってことは、本当に『おはよう』ってどういう意味なのか、心では全く分かってないってこと！？</p>
         </div>
       </div>
 
-      <div class="flex flex-row-reverse items-start gap-4 mb-6">
-        <img src="./images/ウパ博士-思考分析-512×512-透過.png" alt="ウパ博士" class="w-20 h-20 object-contain flex-shrink-0">
+      <div class="flex flex-row-reverse items-start gap-4 mb-8">
+        <div class="char-stack char-stack--upa">
+        <img src="./images/ウパ博士-思考、分析-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">ウパ博士</p>
+        </div>
         <div class="char-bubble char-bubble--from-right flex-1">
-          <p class="text-lg text-gray-800">その通りです。AIは膨大な言葉の『数字の地図』を持っています。だからこそ、AIには<span class="bubble-key">『あなたはプロのWebライターです』みたいに、前提条件をしっかり絞り込んであげる</span>必要があるんです。指示を絞ることで、AIが地図の中で探す範囲が狭まり、あなたが欲しい答えを出す『計算の確率』がグッと高まるんですよ。フワッとした指示だと、地図のどこを探せばいいか迷子になって、見当違いな答えになっちゃうんです</p>
+          <p class="bubble-body">その通りです。AIは膨大な言葉の『数字の地図』を持っています。だからこそ、AIには<span class="bubble-key">『あなたはプロのWebライターです』みたいに、前提条件をしっかり絞り込んであげる</span>必要があるんです。指示を絞ることで、AIが地図の中で探す範囲が狭まり、あなたが欲しい答えを出す『計算の確率』がグッと高まるんですよ。フワッとした指示だと、地図のどこを探せばいいか迷子になって、見当違いな答えになっちゃうんです</p>
         </div>
       </div>
 
-      <div class="flex flex-row-reverse items-start gap-4 mb-6" id="sec-ch1-r2">
-        <img src="./images/ウパ博士-真顔-512×512-透過.png" alt="ウパ博士" class="w-20 h-20 object-contain flex-shrink-0">
+      <div class="flex flex-row-reverse items-start gap-4 mb-8" id="sec-ch1-r2">
+        <div class="char-stack char-stack--upa">
+        <img src="./images/ウパ博士-真顔-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">ウパ博士</p>
+        </div>
         <div class="char-bubble char-bubble--from-right flex-1">
-          <p class="text-lg text-gray-800"><span class="bubble-ui">② 「最初」と「最後」にしか注意を払わない（アテンション）</span>——次に、AIは長文を読むとき、『文章の最初（前提）』と『文章の最後（結論）』に強い注意を向けるクセがあります</p>
+          <p class="bubble-body"><span class="bubble-ui">② 「最初」と「最後」にしか注意を払わない（アテンション）</span>——次に、AIは長文を読むとき、『文章の最初（前提）』と『文章の最後（結論）』に強い注意を向けるクセがあります</p>
         </div>
       </div>
 
-      <div class="flex items-start gap-4 mb-6">
-        <img src="./images/パニっくん-焦り-512×512-透過.png" alt="パニっくん" class="w-20 h-20 object-contain flex-shrink-0">
+      <div class="flex items-start gap-4 mb-8">
+        <div class="char-stack char-stack--panik">
+        <img src="./images/パニっくん-焦り-512×512-透過.png" alt="パニっくん" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">パニっくん</p>
+        </div>
         <div class="char-bubble char-bubble--from-left flex-1">
-          <p class="text-lg text-gray-800">あー！俺もスタッフに長文のLINE送るとき、大事な要件が真ん中にあると見落とされちゃうことあるわ</p>
+          <p class="bubble-body">あー！俺もスタッフに長文のLINE送るとき、大事な要件が真ん中にあると見落とされちゃうことあるわ</p>
         </div>
       </div>
 
-      <div class="flex flex-row-reverse items-start gap-4 mb-6">
-        <img src="./images/ウパ博士-諭す-512×512-透過.png" alt="ウパ博士" class="w-20 h-20 object-contain flex-shrink-0">
+      <div class="flex flex-row-reverse items-start gap-4 mb-8">
+        <div class="char-stack char-stack--upa">
+        <img src="./images/ウパ博士-諭す-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">ウパ博士</p>
+        </div>
         <div class="char-bubble char-bubble--from-right flex-1">
-          <p class="text-lg text-gray-800">人間もAIも同じですね。だから絶対に守ってほしいルールは、指示の『一番上』か『一番下』に書く。これだけでAIのミスが激減します</p>
+          <p class="bubble-body">人間もAIも同じですね。だから絶対に守ってほしいルールは、指示の『一番上』か『一番下』に書く。これだけでAIのミスが激減します</p>
         </div>
       </div>
 
-      <div class="flex flex-row-reverse items-start gap-4 mb-6" id="sec-ch1-r3">
-        <img src="./images/ウパ博士-標準-512×512-透過.png" alt="ウパ博士" class="w-20 h-20 object-contain flex-shrink-0">
+      <div class="flex flex-row-reverse items-start gap-4 mb-8" id="sec-ch1-r3">
+        <div class="char-stack char-stack--upa">
+        <img src="./images/ウパ博士-標準-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">ウパ博士</p>
+        </div>
         <div class="char-bubble char-bubble--from-right flex-1">
-          <p class="text-lg text-gray-800"><span class="bubble-ui">③ 次の言葉を「ドミノ倒し」で予測する（自己回帰）</span>——最後は、スマホの予測変換のように<span class="bubble-key">『前の言葉から計算して、次に来る確率が高い言葉を1つずつ出しているだけ』</span>という仕組みです。ドミノを1個ずつ倒しているイメージですね</p>
+          <p class="bubble-body"><span class="bubble-ui">③ 次の言葉を「ドミノ倒し」で予測する（自己回帰）</span>——最後は、スマホの予測変換のように<span class="bubble-key">『前の言葉から計算して、次に来る確率が高い言葉を1つずつ出しているだけ』</span>という仕組みです。ドミノを1個ずつ倒しているイメージですね</p>
         </div>
       </div>
 
-      <div class="flex items-start gap-4 mb-6">
-        <img src="./images/パニっくん-強く反発する-512×512-透過.png" alt="パニっくん" class="w-20 h-20 object-contain flex-shrink-0">
+      <div class="flex items-start gap-4 mb-8">
+        <div class="char-stack char-stack--panik">
+        <img src="./images/パニっくん-強く反発する-512×512-透過.png" alt="パニっくん" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">パニっくん</p>
+        </div>
         <div class="char-bubble char-bubble--from-left flex-1">
-          <p class="text-lg text-gray-800">ってことは、途中でドミノの方向がズレたら、そのまま最後まで間違った方向に倒れ続けちゃうってこと！？</p>
+          <p class="bubble-body">ってことは、途中でドミノの方向がズレたら、そのまま最後まで間違った方向に倒れ続けちゃうってこと！？</p>
         </div>
       </div>
 
-      <div class="flex flex-row-reverse items-start gap-4 mb-6">
-        <img src="./images/ウパ博士-思考分析-512×512-透過.png" alt="ウパ博士" class="w-20 h-20 object-contain flex-shrink-0">
+      <div class="flex flex-row-reverse items-start gap-4 mb-8">
+        <div class="char-stack char-stack--upa">
+        <img src="./images/ウパ博士-思考、分析-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">ウパ博士</p>
+        </div>
         <div class="char-bubble char-bubble--from-right flex-1">
-          <p class="text-lg text-gray-800">大正解！だから、一気に10個の複雑な仕事を丸投げすると、平気でウソをつきます。『まずはタイトル案を出して』『次にこの中から選んで』と、細かくステップを区切って指示を出す。これが最強のコツです</p>
+          <p class="bubble-body">大正解！だから、一気に10個の複雑な仕事を丸投げすると、平気でウソをつきます。『まずはタイトル案を出して』『次にこの中から選んで』と、細かくステップを区切って指示を出す。これが最強のコツです</p>
         </div>
       </div>
 
-      <div class="flex items-start gap-4 mb-6">
-        <img src="./images/パニっくん-調子に乗ってる-512×512-透過.png" alt="パニっくん" class="w-20 h-20 object-contain flex-shrink-0">
+      <div class="flex items-start gap-4 mb-8">
+        <div class="char-stack char-stack--panik">
+        <img src="./images/パニっくん-調子に乗ってる-512×512-透過.png" alt="パニっくん" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">パニっくん</p>
+        </div>
         <div class="char-bubble char-bubble--from-left flex-1">
-          <p class="text-lg text-gray-800">うおおお！俺が今まで『AI全然使えねー！』ってキレてたの、人間の新人スタッフに仕事丸投げするみたいな雑な指示出してたからじゃん…！</p>
+          <p class="bubble-body">うおおお！俺が今まで『AI全然使えねー！』ってキレてたの、人間の新人スタッフに仕事丸投げするみたいな雑な指示出してたからじゃん…！</p>
         </div>
       </div>
 
-      <div class="flex flex-row-reverse items-start gap-4 mb-6">
-        <img src="./images/ウパ博士-真顔-512×512-透過.png" alt="ウパ博士" class="w-20 h-20 object-contain flex-shrink-0">
+      <div class="flex flex-row-reverse items-start gap-4 mb-8">
+        <div class="char-stack char-stack--upa">
+        <img src="./images/ウパ博士-真顔-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">ウパ博士</p>
+        </div>
         <div class="char-bubble char-bubble--from-right flex-1">
-          <p class="text-lg text-gray-800">それに気づけただけで、すでに上位数％のリテラシーですよ。まずはこの『AIの計算のクセ』を知ることが、仕事に『余白』を生み出す第一歩です。じゃあ次章では、山のようにあるAIツールから、どうやって相棒を選べばいいか整理しましょう！</p>
+          <p class="bubble-body">それに気づけただけで、すでに上位数％のリテラシーですよ。まずはこの『AIの計算のクセ』を知ることが、仕事に『余白』を生み出す第一歩です。じゃあ次章では、山のようにあるAIツールから、どうやって相棒を選べばいいか整理しましょう！</p>
         </div>
       </div>
 
     </section>
-    <section class="section-card" id="sec-ch2">
-      <div class="flex items-start gap-4 mb-6">
-        <img src="./images/パニっくん-自信がない-512×512-透過.png" alt="パニっくん" class="w-20 h-20 object-contain flex-shrink-0">
+
+    <h2 class="body-chapter-heading" id="sec-ch2">第2章：AIツールの「本当の顔」</h2>
+    <section class="section-card">
+      <div class="flex items-start gap-4 mb-8">
+        <div class="char-stack char-stack--panik">
+        <img src="./images/パニっくん-自信がない、落ち込んでいる-512×512-透過.png" alt="パニっくん" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">パニっくん</p>
+        </div>
         <div class="char-bubble char-bubble--from-left flex-1">
-          <p class="text-lg text-gray-800">AIのクセはわかった！でもさ博士、結局どのツールを使えばいいの？最近なんかもう、新しいAIが出すぎてて完全に思考停止してるんだけど…</p>
+          <p class="bubble-body">AIのクセはわかった！でもさ博士、結局どのツールを使えばいいの？最近なんかもう、新しいAIが出すぎてて完全に思考停止してるんだけど…</p>
         </div>
       </div>
 
-      <div class="flex flex-row-reverse items-start gap-4 mb-6">
-        <img src="./images/ウパ博士-諭す-512×512-透過.png" alt="ウパ博士" class="w-20 h-20 object-contain flex-shrink-0">
+      <div class="flex flex-row-reverse items-start gap-4 mb-8">
+        <div class="char-stack char-stack--upa">
+        <img src="./images/ウパ博士-諭す-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">ウパ博士</p>
+        </div>
         <div class="char-bubble char-bubble--from-right flex-1">
-          <p class="text-lg text-gray-800">無理もありません。今、世界中からとんでもないスピードで新しい優秀なAIが生まれていますからね。例えばパッと思いつくだけでも……<span class="bubble-ui">『ChatGPT』はもちろん、Microsoftの『Copilot』</span>、リサーチに強い<span class="bubble-ui">『Genspark』</span>や<span class="bubble-ui">『Perplexity』</span>、勝手に仕事を進めてくれる<span class="bubble-ui">『Manus』</span>。さらに<span class="bubble-ui">『Claude』</span>や<span class="bubble-ui">『Gemini』</span>、他にも<span class="bubble-ui">『Notion AI』</span>や画像を作る<span class="bubble-ui">『Midjourney』</span>など……挙げ始めればキリがありません</p>
+          <p class="bubble-body">無理もありません。今、世界中からとんでもないスピードで新しい優秀なAIが生まれていますからね。例えばパッと思いつくだけでも……<span class="bubble-ui">『ChatGPT』はもちろん、Microsoftの『Copilot』</span>、リサーチに強い<span class="bubble-ui">『Genspark』</span>や<span class="bubble-ui">『Perplexity』</span>、勝手に仕事を進めてくれる<span class="bubble-ui">『Manus』</span>。さらに<span class="bubble-ui">『Claude』</span>や<span class="bubble-ui">『Gemini』</span>、他にも<span class="bubble-ui">『Notion AI』</span>や画像を作る<span class="bubble-ui">『Midjourney』</span>など……挙げ始めればキリがありません</p>
         </div>
       </div>
 
-      <div class="flex items-start gap-4 mb-6">
-        <img src="./images/パニっくん-ひどく慌てる様子-512×512-透過.png" alt="パニっくん" class="w-20 h-20 object-contain flex-shrink-0">
+      <div class="flex items-start gap-4 mb-8">
+        <div class="char-stack char-stack--panik">
+        <img src="./images/パニっくん-ひどく慌てている-512×512-透過.png" alt="パニっくん" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">パニっくん</p>
+        </div>
         <div class="char-bubble char-bubble--from-left flex-1">
-          <p class="text-lg text-gray-800">うわあああ！もう名前聞いてるだけで頭痛くなってきた！それぞれスゴイのは分かるけど、こんなの全部追ってたら仕事する時間なくなっちゃうよ！</p>
+          <p class="bubble-body">うわあああ！もう名前聞いてるだけで頭痛くなってきた！それぞれスゴイのは分かるけど、こんなの全部追ってたら仕事する時間なくなっちゃうよ！</p>
         </div>
       </div>
 
-      <div class="flex flex-row-reverse items-start gap-4 mb-6">
-        <img src="./images/ウパ博士-標準-512×512-透過.png" alt="ウパ博士" class="w-20 h-20 object-contain flex-shrink-0">
+      <div class="flex flex-row-reverse items-start gap-4 mb-8">
+        <div class="char-stack char-stack--upa">
+        <img src="./images/ウパ博士-標準-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">ウパ博士</p>
+        </div>
         <div class="char-bubble char-bubble--from-right flex-1">
-          <p class="text-lg text-gray-800">その通りです。パニっくんのように『早く仕事を終わらせて自分の時間を作りたい』人が、<span class="bubble-key">これらすべてのツールを使いこなそうとするのは絶対にNG</span>です。最新ツールを追いかけるだけの『AIノウハウコレクター』になってしまい、一生『時間がない』と嘆くことになります</p>
+          <p class="bubble-body">その通りです。パニっくんのように『早く仕事を終わらせて自分の時間を作りたい』人が、<span class="bubble-key">これらすべてのツールを使いこなそうとするのは絶対にNG</span>です。最新ツールを追いかけるだけの『AIノウハウコレクター』になってしまい、一生『時間がない』と嘆くことになります</p>
         </div>
       </div>
 
-      <div class="flex items-start gap-4 mb-6">
-        <img src="./images/パニっくん-涙ぐむ-512×512-透過.png" alt="パニっくん" class="w-20 h-20 object-contain flex-shrink-0">
+      <div class="flex items-start gap-4 mb-8">
+        <div class="char-stack char-stack--panik">
+        <img src="./images/パニっくん-涙ぐむ-512×512-透過.png" alt="パニっくん" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">パニっくん</p>
+        </div>
         <div class="char-bubble char-bubble--from-left flex-1">
-          <p class="text-lg text-gray-800">じゃあ、俺はどうすればいいの！？全部すごいAIなんでしょ？</p>
+          <p class="bubble-body">じゃあ、俺はどうすればいいの！？全部すごいAIなんでしょ？</p>
         </div>
       </div>
 
-      <div class="flex flex-row-reverse items-start gap-4 mb-6">
-        <img src="./images/ウパ博士-思考分析-512×512-透過.png" alt="ウパ博士" class="w-20 h-20 object-contain flex-shrink-0">
+      <div class="flex flex-row-reverse items-start gap-4 mb-8">
+        <div class="char-stack char-stack--upa">
+        <img src="./images/ウパ博士-思考、分析-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">ウパ博士</p>
+        </div>
         <div class="char-bubble char-bubble--from-right flex-1">
-          <p class="text-lg text-gray-800">答えはシンプルです。<span class="bubble-key">最初は『2つのツール』だけに絞ってください。</span></p>
+          <p class="bubble-body">答えはシンプルです。<span class="bubble-key">最初は『2つのツール』だけに絞ってください。</span></p>
         </div>
       </div>
 
     </section>
-    <section class="section-card" id="sec-ch3">
-      <div class="flex items-start gap-4 mb-6">
-        <img src="./images/パニっくん-驚き-512×512-透過.png" alt="パニっくん" class="w-20 h-20 object-contain flex-shrink-0">
+
+    <h2 class="body-chapter-heading" id="sec-ch3">第3章：2つのツールに絞る理由と選び方</h2>
+    <section class="section-card">
+      <div class="flex items-start gap-4 mb-8">
+        <div class="char-stack char-stack--panik">
+        <img src="./images/パニっくん-驚き-512×512-透過.png" alt="パニっくん" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">パニっくん</p>
+        </div>
         <div class="char-bubble char-bubble--from-left flex-1">
-          <p class="text-lg text-gray-800">たった2つでいいの！？ 時間がない俺には助かるけど……でも、全部すごいAIなんでしょ？ 他のを使わないと、結局また時代に取り残されちゃわないか不安だよ……</p>
+          <p class="bubble-body">たった2つでいいの！？ 時間がない俺には助かるけど……でも、全部すごいAIなんでしょ？ 他のを使わないと、結局また時代に取り残されちゃわないか不安だよ……</p>
         </div>
       </div>
 
-      <div class="flex flex-row-reverse items-start gap-4 mb-6">
-        <img src="./images/ウパ博士-真顔-512×512-透過.png" alt="ウパ博士" class="w-20 h-20 object-contain flex-shrink-0">
+      <div class="flex flex-row-reverse items-start gap-4 mb-8">
+        <div class="char-stack char-stack--upa">
+        <img src="./images/ウパ博士-真顔-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">ウパ博士</p>
+        </div>
         <div class="char-bubble char-bubble--from-right flex-1">
-          <p class="text-lg text-gray-800">パニっくん、明日から全く性格も得意なことも違う外国人スタッフが、いきなり9人入ってくると想像してください。あなた一人で、全員に仕事のやり方を教えられますか？</p>
+          <p class="bubble-body">パニっくん、明日から全く性格も得意なことも違う外国人スタッフが、いきなり9人入ってくると想像してください。あなた一人で、全員に仕事のやり方を教えられますか？</p>
         </div>
       </div>
 
-      <div class="flex items-start gap-4 mb-6">
-        <img src="./images/パニっくん-疑っている-512×512-透過.png" alt="パニっくん" class="w-20 h-20 object-contain flex-shrink-0">
+      <div class="flex items-start gap-4 mb-8">
+        <div class="char-stack char-stack--panik">
+        <img src="./images/パニっくん-疑っている-512×512-透過.png" alt="パニっくん" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">パニっくん</p>
+        </div>
         <div class="char-bubble char-bubble--from-left flex-1">
-          <p class="text-lg text-gray-800">うっ……。想像しただけで発狂しそう。俺がパンクするわ</p>
+          <p class="bubble-body">うっ……。想像しただけで発狂しそう。俺がパンクするわ</p>
         </div>
       </div>
 
-      <div class="flex flex-row-reverse items-start gap-4 mb-6">
-        <img src="./images/ウパ博士-諭す-512×512-透過.png" alt="ウパ博士" class="w-20 h-20 object-contain flex-shrink-0">
+      <div class="flex flex-row-reverse items-start gap-4 mb-8">
+        <div class="char-stack char-stack--upa">
+        <img src="./images/ウパ博士-諭す-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">ウパ博士</p>
+        </div>
         <div class="char-bubble char-bubble--from-right flex-1">
-          <p class="text-lg text-gray-800">ですよね。AI初心者が複数のツールに手を出すと失敗する最大の理由は、『このアプリはどうログインするんだっけ？』と<span class="bubble-key">操作を覚えるだけでエネルギーが尽きるから</span>です。私たちが欲しいのは『自分の時間の余白』であって、『最新ツールを使いこなす名誉』ではないはずですよね？</p>
+          <p class="bubble-body">ですよね。AI初心者が複数のツールに手を出すと失敗する最大の理由は、『このアプリはどうログインするんだっけ？』と<span class="bubble-key">操作を覚えるだけでエネルギーが尽きるから</span>です。私たちが欲しいのは『自分の時間の余白』であって、『最新ツールを使いこなす名誉』ではないはずですよね？</p>
         </div>
       </div>
 
-      <div class="flex items-start gap-4 mb-6">
-        <img src="./images/パニっくん-マジ？-512×512-透過.png" alt="パニっくん" class="w-20 h-20 object-contain flex-shrink-0">
+      <div class="flex items-start gap-4 mb-8">
+        <div class="char-stack char-stack--panik">
+        <img src="./images/パニっくん-マジ？-512×512-透過.png" alt="パニっくん" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">パニっくん</p>
+        </div>
         <div class="char-bubble char-bubble--from-left flex-1">
-          <p class="text-lg text-gray-800">うわ、めっちゃ図星…。今までの俺、新しいツールに課金してログインしただけで『これで俺も最先端だ！』って満足して終わってたわ…。<span class="bubble-key">時間を作るためにAIを使いたいのに、ツールの設定や操作に休日の時間を奪われてたら完全に本末転倒</span>じゃん。じゃあ、俺が選ぶべき最強の2人は誰なの？</p>
+          <p class="bubble-body">うわ、めっちゃ図星…。今までの俺、新しいツールに課金してログインしただけで『これで俺も最先端だ！』って満足して終わってたわ…。<span class="bubble-key">時間を作るためにAIを使いたいのに、ツールの設定や操作に休日の時間を奪われてたら完全に本末転倒</span>じゃん。じゃあ、俺が選ぶべき最強の2人は誰なの？</p>
         </div>
       </div>
 
-      <div class="flex flex-row-reverse items-start gap-4 mb-6">
-        <img src="./images/ウパ博士-標準-512×512-透過.png" alt="ウパ博士" class="w-20 h-20 object-contain flex-shrink-0">
+      <div class="flex flex-row-reverse items-start gap-4 mb-8">
+        <div class="char-stack char-stack--upa">
+        <img src="./images/ウパ博士-標準-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">ウパ博士</p>
+        </div>
         <div class="char-bubble char-bubble--from-right flex-1">
-          <p class="text-lg text-gray-800">ズバリ、<span class="bubble-ui">『Gemini（ジェミニ）』と『Claude（クロード）』</span>です。この2つがあれば、あなたの業務の中で『人間がやらなくてもいい作業』を的確にカバーし、劇的に負担を減らすことができます。</p>
+          <p class="bubble-body">ズバリ、<span class="bubble-ui">『Gemini（ジェミニ）』と『Claude（クロード）』</span>です。この2つがあれば、あなたの業務の中で『人間がやらなくてもいい作業』を的確にカバーし、劇的に負担を減らすことができます。</p>
         </div>
       </div>
 
-      <div class="flex flex-row-reverse items-start gap-4 mb-6" id="sec-ch3-gemini">
-        <img src="./images/ウパ博士-思考分析-512×512-透過.png" alt="ウパ博士" class="w-20 h-20 object-contain flex-shrink-0">
+      <div class="flex flex-row-reverse items-start gap-4 mb-8" id="sec-ch3-gemini">
+        <div class="char-stack char-stack--upa">
+        <img src="./images/ウパ博士-思考、分析-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">ウパ博士</p>
+        </div>
         <div class="char-bubble char-bubble--from-right flex-1">
-          <p class="text-lg text-gray-800"><span class="bubble-ui">① 最初のステップ：Geminiで「AIで仕事がラクになる感覚」を掴む</span>——まず最初はGeminiです。パニっくんは普段の予約管理や売上計算、お客さんとのやり取りに『Googleドキュメント』や『スプレッドシート』『Gmail』『Googleカレンダー』を使ってませんか？</p>
+          <p class="bubble-body"><span class="bubble-ui">① 最初のステップ：Geminiで「AIで仕事がラクになる感覚」を掴む</span>——まず最初はGeminiです。パニっくんは普段の予約管理や売上計算、お客さんとのやり取りに『Googleドキュメント』や『スプレッドシート』『Gmail』『Googleカレンダー』を使ってませんか？</p>
         </div>
       </div>
 
-      <div class="flex items-start gap-4 mb-6">
-        <img src="./images/パニっくん-標準-512×512-透過.png" alt="パニっくん" class="w-20 h-20 object-contain flex-shrink-0">
+      <div class="flex items-start gap-4 mb-8">
+        <div class="char-stack char-stack--panik">
+        <img src="./images/パニっくん-標準-512×512-透過.png" alt="パニっくん" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">パニっくん</p>
+        </div>
         <div class="char-bubble char-bubble--from-left flex-1">
-          <p class="text-lg text-gray-800">使ってる使ってる！現場でスマホから入力した予約やメモが、裏のPCのデータとも一瞬で繋がってどこからでも作業の続きができるから、あのスムーズさがないと仕事回らないんだよね！</p>
+          <p class="bubble-body">使ってる使ってる！現場でスマホから入力した予約やメモが、裏のPCのデータとも一瞬で繋がってどこからでも作業の続きができるから、あのスムーズさがないと仕事回らないんだよね！</p>
         </div>
       </div>
 
-      <div class="flex flex-row-reverse items-start gap-4 mb-6">
-        <img src="./images/ウパ博士-真顔-512×512-透過.png" alt="ウパ博士" class="w-20 h-20 object-contain flex-shrink-0">
+      <div class="flex flex-row-reverse items-start gap-4 mb-8">
+        <div class="char-stack char-stack--upa">
+        <img src="./images/ウパ博士-真顔-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">ウパ博士</p>
+        </div>
         <div class="char-bubble char-bubble--from-right flex-1">
-          <p class="text-lg text-gray-800">それならGeminiの独壇場です。わざわざ別の画面を開かなくても、<span class="bubble-key">いつものGoogleの仕事画面の中で『このメールの返信案を書いて』『カレンダーの予定を教えて』と指示ができる</span>んです。さらに、自分専用のAIアシスタントを作れる『NotebookLM』というGoogleの神ツールとも相性抜群。難しい設定ゼロで、一番早く『自分の時間が空いた！』という成功体験を得られます</p>
+          <p class="bubble-body">それならGeminiの独壇場です。わざわざ別の画面を開かなくても、<span class="bubble-key">いつものGoogleの仕事画面の中で『このメールの返信案を書いて』『カレンダーの予定を教えて』と指示ができる</span>んです。さらに、自分専用のAIアシスタントを作れる『NotebookLM』というGoogleの神ツールとも相性抜群。難しい設定ゼロで、一番早く『自分の時間が空いた！』という成功体験を得られます</p>
         </div>
       </div>
 
-      <div class="flex flex-row-reverse items-start gap-4 mb-6" id="sec-ch3-claude">
-        <img src="./images/ウパ博士-諭す-512×512-透過.png" alt="ウパ博士" class="w-20 h-20 object-contain flex-shrink-0">
+      <div class="flex flex-row-reverse items-start gap-4 mb-8" id="sec-ch3-claude">
+        <div class="char-stack char-stack--upa">
+        <img src="./images/ウパ博士-諭す-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">ウパ博士</p>
+        </div>
         <div class="char-bubble char-bubble--from-right flex-1">
-          <p class="text-lg text-gray-800"><span class="bubble-ui">② 次のステップ：Claudeで「業務を一気通貫で自動化」する</span>——GeminiでAIに慣れたら、本命であるClaudeの出番です。Claudeには『Cowork』という素晴らしい機能が追加され、様々な業務を一気通貫で任せられるようになりました。さらに『Claude Code』を使えば、IT知識ゼロでも<span class="bubble-key">自分専用の簡単な業務アプリをすぐに開発できてしまう</span>んです</p>
+          <p class="bubble-body"><span class="bubble-ui">② 次のステップ：Claudeで「業務を一気通貫で自動化」する</span>——GeminiでAIに慣れたら、本命であるClaudeの出番です。Claudeには『Cowork』という素晴らしい機能が追加され、様々な業務を一気通貫で任せられるようになりました。さらに『Claude Code』を使えば、IT知識ゼロでも<span class="bubble-key">自分専用の簡単な業務アプリをすぐに開発できてしまう</span>んです</p>
         </div>
       </div>
 
-      <div class="flex items-start gap-4 mb-6">
-        <img src="./images/パニっくん-焦り-512×512-透過.png" alt="パニっくん" class="w-20 h-20 object-contain flex-shrink-0">
+      <div class="flex items-start gap-4 mb-8">
+        <div class="char-stack char-stack--panik">
+        <img src="./images/パニっくん-焦り-512×512-透過.png" alt="パニっくん" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">パニっくん</p>
+        </div>
         <div class="char-bubble char-bubble--from-left flex-1">
-          <p class="text-lg text-gray-800">ええっ！？俺の代わりにシステムまで作ってくれるの！？天才すぎる！</p>
+          <p class="bubble-body">ええっ！？俺の代わりにシステムまで作ってくれるの！？天才すぎる！</p>
         </div>
       </div>
 
-      <div class="flex flex-row-reverse items-start gap-4 mb-6">
-        <img src="./images/ウパ博士-標準-512×512-透過.png" alt="ウパ博士" class="w-20 h-20 object-contain flex-shrink-0">
+      <div class="flex flex-row-reverse items-start gap-4 mb-8">
+        <div class="char-stack char-stack--upa">
+        <img src="./images/ウパ博士-標準-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">ウパ博士</p>
+        </div>
         <div class="char-bubble char-bubble--from-right flex-1">
-          <p class="text-lg text-gray-800">はい。ただし、Claudeは少し機能が複雑で難易度が高めです。だからこそ、最初はGeminiで基礎固めをし、次にClaudeをマスターするという順序が鉄則なんです</p>
+          <p class="bubble-body">はい。ただし、Claudeは少し機能が複雑で難易度が高めです。だからこそ、最初はGeminiで基礎固めをし、次にClaudeをマスターするという順序が鉄則なんです</p>
         </div>
       </div>
 
-      <div class="flex items-start gap-4 mb-6">
-        <img src="./images/パニっくん-強く反発する-512×512-透過.png" alt="パニっくん" class="w-20 h-20 object-contain flex-shrink-0">
+      <div class="flex items-start gap-4 mb-8">
+        <div class="char-stack char-stack--panik">
+        <img src="./images/パニっくん-強く反発する-512×512-透過.png" alt="パニっくん" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">パニっくん</p>
+        </div>
         <div class="char-bubble char-bubble--from-left flex-1">
-          <p class="text-lg text-gray-800">なるほど！役割分担と順番が明確になったよ。でも博士、両方使うとなると毎月の課金代がバカにならないんじゃ…？</p>
+          <p class="bubble-body">なるほど！役割分担と順番が明確になったよ。でも博士、両方使うとなると毎月の課金代がバカにならないんじゃ…？</p>
         </div>
       </div>
 
-      <div class="flex flex-row-reverse items-start gap-4 mb-6">
-        <img src="./images/ウパ博士-思考分析-512×512-透過.png" alt="ウパ博士" class="w-20 h-20 object-contain flex-shrink-0">
+      <div class="flex flex-row-reverse items-start gap-4 mb-8">
+        <div class="char-stack char-stack--upa">
+        <img src="./images/ウパ博士-思考、分析-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">ウパ博士</p>
+        </div>
         <div class="char-bubble char-bubble--from-right flex-1">
-          <p class="text-lg text-gray-800">良い質問です。資金に余裕があるなら両方課金するのがベストですが、もし限られた予算でスタートするなら、<span class="bubble-ui">『絶対に課金すべきはClaude』です。Claudeの超強力な機能（Cowork）をフル活用すべきだからです。 一方のGeminiも、最初は無料版で様子を見るのも手ですが、実は無料版だと『使用制限』に引っかかり、いざという時に使えないストレスがあります。ただ、Geminiの有料版には無料トライアル期間</span>が用意されているんです。 過去の課金で痛い目を見ているパニっくんだからこそ、まずはリスクゼロの無料期間で『有料版のサクサク動く快適さ』を試してみてください。使ってみて合わなければ、課金される前に解約してしまえばいいんですから！</p>
+          <p class="bubble-body">良い質問です。資金に余裕があるなら両方課金するのがベストですが、もし限られた予算でスタートするなら、<span class="bubble-key">絶対に課金すべきはClaude</span>です。<span class="bubble-ui">Cowork</span>などの強力な機能をフル活用したいなら、特にそうしたいところです。<br><br>一方の<span class="bubble-ui">Gemini</span>は、最初は無料版で様子を見るのも手です。ただ無料版だと<span class="bubble-ui">使用制限</span>に引っかかり、いざというときに使えないストレスが出ることがあります。<span class="bubble-ui">Gemini</span>の有料版には<span class="bubble-key">無料トライアル期間</span>が用意されていることも多いんです。<br><br>過去の課金で痛い目を見ているパニっくんだからこそ、まずはリスクゼロの無料期間で「有料版のサクサク動く快適さ」を試してみてください。使ってみて合わなければ、課金される前に解約してしまえばいいんですから！</p>
         </div>
       </div>
 
-      <div class="flex items-start gap-4 mb-6">
-        <img src="./images/パニっくん-調子に乗ってる-512×512-透過.png" alt="パニっくん" class="w-20 h-20 object-contain flex-shrink-0">
+      <div class="flex items-start gap-4 mb-8">
+        <div class="char-stack char-stack--panik">
+        <img src="./images/パニっくん-調子に乗ってる-512×512-透過.png" alt="パニっくん" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">パニっくん</p>
+        </div>
         <div class="char-bubble char-bubble--from-left flex-1">
-          <p class="text-lg text-gray-800">よし！迷いが消えた！メインの武器はClaude、Google環境のサポートはGemini！今日からこの2人に俺の仕事を叩き込んでやるぜ！！</p>
+          <p class="bubble-body">よし！迷いが消えた！メインの武器はClaude、Google環境のサポートはGemini！今日からこの2人に俺の仕事を叩き込んでやるぜ！！</p>
         </div>
       </div>
 
-      <div class="flex flex-row-reverse items-start gap-4 mb-6">
-        <img src="./images/ウパ博士-真顔-512×512-透過.png" alt="ウパ博士" class="w-20 h-20 object-contain flex-shrink-0">
+      <div class="flex flex-row-reverse items-start gap-4 mb-8">
+        <div class="char-stack char-stack--upa">
+        <img src="./images/ウパ博士-真顔-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">ウパ博士</p>
+        </div>
         <div class="char-bubble char-bubble--from-right flex-1">
-          <p class="text-lg text-gray-800">素晴らしい決断です。……ですがパニっくん。実は、ツールを絞っても、まだあなたの仕事はラクになりません。最後に<span class="bubble-key">『もう一つだけ、絶対に欠かせない力』</span>が必要なんです</p>
+          <p class="bubble-body">素晴らしい決断です。……ですがパニっくん。実は、ツールを絞っても、まだあなたの仕事はラクになりません。最後に<span class="bubble-key">『もう一つだけ、絶対に欠かせない力』</span>が必要なんです</p>
         </div>
       </div>
 
     </section>
-    <section class="section-card" id="sec-ch4">
-      <div class="flex items-start gap-4 mb-6">
-        <img src="./images/パニっくん-自信がない-512×512-透過.png" alt="パニっくん" class="w-20 h-20 object-contain flex-shrink-0">
+
+    <h2 class="body-chapter-heading" id="sec-ch4">第4章：言語化力・分解力と伴走</h2>
+    <section class="section-card">
+      <div class="flex items-start gap-4 mb-8">
+        <div class="char-stack char-stack--panik">
+        <img src="./images/パニっくん-自信がない、落ち込んでいる-512×512-透過.png" alt="パニっくん" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">パニっくん</p>
+        </div>
         <div class="char-bubble char-bubble--from-left flex-1">
-          <p class="text-lg text-gray-800">えっ！？まだあるの！？じらしすぎだよ博士！</p>
+          <p class="bubble-body">えっ！？まだあるの！？じらしすぎだよ博士！</p>
         </div>
       </div>
 
-      <div class="flex flex-row-reverse items-start gap-4 mb-6">
-        <img src="./images/ウパ博士-諭す-512×512-透過.png" alt="ウパ博士" class="w-20 h-20 object-contain flex-shrink-0">
+      <div class="flex flex-row-reverse items-start gap-4 mb-8">
+        <div class="char-stack char-stack--upa">
+        <img src="./images/ウパ博士-諭す-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">ウパ博士</p>
+        </div>
         <div class="char-bubble char-bubble--from-right flex-1">
-          <p class="text-lg text-gray-800">それは、『言語化力』と『分解力』です。簡単に言うと、<span class="bubble-key">『自分の毎日の仕事の、どの部分にAIを取り入れるか』を正確に見極める力</span>のことです</p>
+          <p class="bubble-body">それは、『言語化力』と『分解力』です。簡単に言うと、<span class="bubble-key">『自分の毎日の仕事の、どの部分にAIを取り入れるか』を正確に見極める力</span>のことです</p>
         </div>
       </div>
 
-      <div class="flex items-start gap-4 mb-6">
-        <img src="./images/パニっくん-ひどく慌てる様子-512×512-透過.png" alt="パニっくん" class="w-20 h-20 object-contain flex-shrink-0">
+      <div class="flex items-start gap-4 mb-8">
+        <div class="char-stack char-stack--panik">
+        <img src="./images/パニっくん-ひどく慌てている-512×512-透過.png" alt="パニっくん" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">パニっくん</p>
+        </div>
         <div class="char-bubble char-bubble--from-left flex-1">
-          <p class="text-lg text-gray-800">分解力…？どういうこと？</p>
+          <p class="bubble-body">分解力…？どういうこと？</p>
         </div>
       </div>
 
-      <div class="flex flex-row-reverse items-start gap-4 mb-6">
-        <img src="./images/ウパ博士-標準-512×512-透過.png" alt="ウパ博士" class="w-20 h-20 object-contain flex-shrink-0">
+      <div class="flex flex-row-reverse items-start gap-4 mb-8">
+        <div class="char-stack char-stack--upa">
+        <img src="./images/ウパ博士-標準-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">ウパ博士</p>
+        </div>
         <div class="char-bubble char-bubble--from-right flex-1">
-          <p class="text-lg text-gray-800">例えば、毎日クタクタになりながら書いている『日報作成』を完全自動化しようとしたとします。でも、いきなりAIに『日報書いて』と丸投げしてはいけません。まずは業務をこう分解するんです。 ①『どんなデータを、どうやって集めているか？AIが読みやすい形になっているか？』（インプットの整理） ②『最終的にどんな形で、どこ（Slackなど）に、毎日何時に出したいか？』（アウトプットの決定） ③『どうやってAIにデータを読み込ませて、自動で送らせるか？』（仕組みの構築）</p>
+          <p class="bubble-body">例えば、毎日クタクタになりながら書いている『日報作成』を完全自動化しようとしたとします。でも、いきなりAIに『日報書いて』と丸投げしてはいけません。まずは業務をこう分解するんです。<br><br>①『どんなデータを、どうやって集めているか？AIが読みやすい形になっているか？』（インプットの整理）<br>②『最終的にどんな形で、どこ（<span class="bubble-ui">Slack</span>など）に、毎日何時に出したいか？』（アウトプットの決定）<br>③『どうやってAIにデータを読み込ませて、自動で送らせるか？』（仕組みの構築）</p>
         </div>
       </div>
 
-      <div class="flex items-start gap-4 mb-6">
-        <img src="./images/パニっくん-涙ぐむ-512×512-透過.png" alt="パニっくん" class="w-20 h-20 object-contain flex-shrink-0">
+      <div class="flex items-start gap-4 mb-8">
+        <div class="char-stack char-stack--panik">
+        <img src="./images/パニっくん-涙ぐむ-512×512-透過.png" alt="パニっくん" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">パニっくん</p>
+        </div>
         <div class="char-bubble char-bubble--from-left flex-1">
-          <p class="text-lg text-gray-800">ええと……材料を整理して、ゴールを決めて、道筋を考えるってこと？</p>
+          <p class="bubble-body">ええと……材料を整理して、ゴールを決めて、道筋を考えるってこと？</p>
         </div>
       </div>
 
-      <div class="flex flex-row-reverse items-start gap-4 mb-6">
-        <img src="./images/ウパ博士-思考分析-512×512-透過.png" alt="ウパ博士" class="w-20 h-20 object-contain flex-shrink-0">
+      <div class="flex flex-row-reverse items-start gap-4 mb-8">
+        <div class="char-stack char-stack--upa">
+        <img src="./images/ウパ博士-思考、分析-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">ウパ博士</p>
+        </div>
         <div class="char-bubble char-bubble--from-right flex-1">
-          <p class="text-lg text-gray-800">そうです！この分解ができたら、パズルみたいにAIの役割を当てはめていきます。例えば、①の『AIが読みやすいデータ管理シート』の土台作りはGeminiが得意です。そして、ここからが本番。すべてを統合して動かすのが、Claudeの『Cowork（コワーク）』という機能です</p>
+          <p class="bubble-body">そうです！この分解ができたら、パズルみたいにAIの役割を当てはめていきます。例えば、①の『AIが読みやすいデータ管理シート』の土台作りはGeminiが得意です。そして、ここからが本番。すべてを統合して動かすのが、Claudeの『Cowork（コワーク）』という機能です</p>
         </div>
       </div>
 
-      <div class="flex items-start gap-4 mb-6">
-        <img src="./images/パニっくん-驚き-512×512-透過.png" alt="パニっくん" class="w-20 h-20 object-contain flex-shrink-0">
+      <div class="flex items-start gap-4 mb-8">
+        <div class="char-stack char-stack--panik">
+        <img src="./images/パニっくん-驚き-512×512-透過.png" alt="パニっくん" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">パニっくん</p>
+        </div>
         <div class="char-bubble char-bubble--from-left flex-1">
-          <p class="text-lg text-gray-800">クロードの……コワーク？</p>
+          <p class="bubble-body">クロードの……コワーク？</p>
         </div>
       </div>
 
-      <div class="flex flex-row-reverse items-start gap-4 mb-6" id="sec-ch4-cowork">
-        <img src="./images/ウパ博士-真顔-512×512-透過.png" alt="ウパ博士" class="w-20 h-20 object-contain flex-shrink-0">
+      <div class="flex flex-row-reverse items-start gap-4 mb-8" id="sec-ch4-cowork">
+        <div class="char-stack char-stack--upa">
+        <img src="./images/ウパ博士-真顔-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">ウパ博士</p>
+        </div>
         <div class="char-bubble char-bubble--from-right flex-1">
-          <p class="text-lg text-gray-800">簡単に言うと、<span class="bubble-ui">『ClaudeがあなたのPCに入り込んで、直接手を動かしてくれる優秀なアシスタント』</span>です。裏側でこっそりデータを送るような単なる設定部屋ではなく、あなたが普段PCを使っているのと同じように働くんです。 例えば…… ・シートを読み取るためにブラウザ（Claude in Chrome）を実際に開く ・内容を読み取って、見やすい日報の文章を考える ・Slackを開いて、あなたのアカウントからタイピングして送信準備をする これらをデスクトップアプリのCoworkにお願いするだけで、Claudeが自律的に一連の作業を進めてくれるんですよ</p>
+          <p class="bubble-body">簡単に言うと、<span class="bubble-key">ClaudeがあなたのPCに入り込んで、直接手を動かしてくれる優秀なアシスタント</span>です。裏側でこっそりデータを送るような単なる設定部屋ではなく、あなたが普段PCを使っているのと同じように働くんです。<br><br>例えば……<br>・シートを読み取るためにブラウザ（<span class="bubble-ui">Claude in Chrome</span>）を実際に開く<br>・内容を読み取って、見やすい日報の文章を考える<br>・<span class="bubble-ui">Slack</span>を開いて、あなたのアカウントからタイピングして送信準備をする<br><br>これらをデスクトップアプリの<span class="bubble-ui">Cowork</span>にお願いするだけで、Claudeが自律的に一連の作業を進めてくれるんですよ</p>
         </div>
       </div>
 
-      <div class="flex items-start gap-4 mb-6">
-        <img src="./images/パニっくん-疑っている-512×512-透過.png" alt="パニっくん" class="w-20 h-20 object-contain flex-shrink-0">
+      <div class="flex items-start gap-4 mb-8">
+        <div class="char-stack char-stack--panik">
+        <img src="./images/パニっくん-疑っている-512×512-透過.png" alt="パニっくん" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">パニっくん</p>
+        </div>
         <div class="char-bubble char-bubble--from-left flex-1">
-          <p class="text-lg text-gray-800">なるほど！Claude自身が俺の代わりにパソコンを操作して仕事を進めてくれるんだね！……ってことは、俺が毎日やる仕事は？</p>
+          <p class="bubble-body">なるほど！Claude自身が俺の代わりにパソコンを操作して仕事を進めてくれるんだね！……ってことは、俺が毎日やる仕事は？</p>
         </div>
       </div>
 
-      <div class="flex flex-row-reverse items-start gap-4 mb-6">
-        <img src="./images/ウパ博士-諭す-512×512-透過.png" alt="ウパ博士" class="w-20 h-20 object-contain flex-shrink-0">
+      <div class="flex flex-row-reverse items-start gap-4 mb-8">
+        <div class="char-stack char-stack--upa">
+        <img src="./images/ウパ博士-諭す-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">ウパ博士</p>
+        </div>
         <div class="char-bubble char-bubble--from-right flex-1">
-          <p class="text-lg text-gray-800">ふふっ。あなたがやるのは『作ったシートに今日の数字を入れるだけ』です。あとは時間になったら、デスクトップで稼働しているClaudeが日報を作成して<span class="bubble-ui">Slack</span>に送信してくれます</p>
+          <p class="bubble-body">ふふっ。あなたがやるのは『作ったシートに今日の数字を入れるだけ』です。あとは時間になったら、デスクトップで稼働しているClaudeが日報を作成して<span class="bubble-ui">Slack</span>に送信してくれます</p>
         </div>
       </div>
 
-      <div class="flex items-start gap-4 mb-6">
-        <img src="./images/パニっくん-マジ？-512×512-透過.png" alt="パニっくん" class="w-20 h-20 object-contain flex-shrink-0">
+      <div class="flex items-start gap-4 mb-8">
+        <div class="char-stack char-stack--panik">
+        <img src="./images/パニっくん-マジ？-512×512-透過.png" alt="パニっくん" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">パニっくん</p>
+        </div>
         <div class="char-bubble char-bubble--from-left flex-1">
-          <p class="text-lg text-gray-800">うおおおお！！なんだそれ、魔法じゃん！！俺の毎日のあの面倒な作業を、AIが全部やってくるってこと！？</p>
+          <p class="bubble-body">うおおおお！！なんだそれ、魔法じゃん！！俺の毎日のあの面倒な作業を、AIが全部やってくるってこと！？</p>
         </div>
       </div>
 
-      <div class="flex flex-row-reverse items-start gap-4 mb-6">
-        <img src="./images/ウパ博士-標準-512×512-透過.png" alt="ウパ博士" class="w-20 h-20 object-contain flex-shrink-0">
+      <div class="flex flex-row-reverse items-start gap-4 mb-8">
+        <div class="char-stack char-stack--upa">
+        <img src="./images/ウパ博士-標準-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">ウパ博士</p>
+        </div>
         <div class="char-bubble char-bubble--from-right flex-1">
-          <p class="text-lg text-gray-800">その通り！……でも、パニっくん。いざ一人でやろうとすると、不安になりませんか？</p>
+          <p class="bubble-body">その通り！……でも、パニっくん。いざ一人でやろうとすると、不安になりませんか？</p>
         </div>
       </div>
 
-      <div class="flex items-start gap-4 mb-6">
-        <img src="./images/パニっくん-標準-512×512-透過.png" alt="パニっくん" class="w-20 h-20 object-contain flex-shrink-0">
+      <div class="flex items-start gap-4 mb-8">
+        <div class="char-stack char-stack--panik">
+        <img src="./images/パニっくん-標準-512×512-透過.png" alt="パニっくん" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">パニっくん</p>
+        </div>
         <div class="char-bubble char-bubble--from-left flex-1">
-          <p class="text-lg text-gray-800">……図星だよ。理屈はわかったけど、いざパソコンの前に座ったら『え、俺のこの業務はどう分解すればいいの？』って絶対フリーズする。結局、誰も助けてくれなくて、また100万溶かした時みたいに挫折しそう……</p>
+          <p class="bubble-body">……図星だよ。理屈はわかったけど、いざパソコンの前に座ったら『え、俺のこの業務はどう分解すればいいの？』って絶対フリーズする。結局、誰も助けてくれなくて、また100万溶かした時みたいに挫折しそう……</p>
         </div>
       </div>
 
-      <div class="flex flex-row-reverse items-start gap-4 mb-6">
-        <img src="./images/ウパ博士-思考分析-512×512-透過.png" alt="ウパ博士" class="w-20 h-20 object-contain flex-shrink-0">
+      <div class="flex flex-row-reverse items-start gap-4 mb-8">
+        <div class="char-stack char-stack--upa">
+        <img src="./images/ウパ博士-思考、分析-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">ウパ博士</p>
+        </div>
         <div class="char-bubble char-bubble--from-right flex-1">
-          <p class="text-lg text-gray-800">パニっくん、安心してください。私は絶対に、あなたを一人で放置したりしません。現場でクタクタになりながらも『なんとかAIを味方につけたい』と願うあなたの痛みが、誰よりも分かるからです</p>
+          <p class="bubble-body">パニっくん、安心してください。私は絶対に、あなたを一人で放置したりしません。現場でクタクタになりながらも『なんとかAIを味方につけたい』と願うあなたの痛みが、誰よりも分かるからです</p>
         </div>
       </div>
 
-      <div class="flex flex-row-reverse items-start gap-4 mb-6">
-        <img src="./images/ウパ博士-真顔-512×512-透過.png" alt="ウパ博士" class="w-20 h-20 object-contain flex-shrink-0">
+      <div class="flex flex-row-reverse items-start gap-4 mb-8">
+        <div class="char-stack char-stack--upa">
+        <img src="./images/ウパ博士-真顔-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">ウパ博士</p>
+        </div>
         <div class="char-bubble char-bubble--from-right flex-1">
-          <p class="text-lg text-gray-800">私の役目は、知識を売りつけることではありません。あなたが私がいなくても、<span class="bubble-key">自分の力でAIの仕組みを構築し、自走できるようになるまで『徹底的に伴走すること』</span>です。その第一歩として、これから以下の順番で、あなたを『AIマスター』に導く特大の無料プレゼントをお渡ししていきます！</p>
+          <p class="bubble-body">私の役目は、知識を売りつけることではありません。あなたが私がいなくても、<span class="bubble-key">自分の力でAIの仕組みを構築し、自走できるようになるまで『徹底的に伴走すること』</span>です。その第一歩として、これから以下の順番で、あなたを『AIマスター』に導く特大の無料プレゼントをお渡ししていきます！</p>
         </div>
       </div>
 
-      <div class="flex flex-row-reverse items-start gap-4 mb-6" id="sec-ch4-gifts">
-        <img src="./images/ウパ博士-諭す-512×512-透過.png" alt="ウパ博士" class="w-20 h-20 object-contain flex-shrink-0">
+      <div class="flex flex-row-reverse items-start gap-4 mb-8" id="sec-ch4-gifts">
+        <div class="char-stack char-stack--upa">
+        <img src="./images/ウパ博士-諭す-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">ウパ博士</p>
+        </div>
         <div class="char-bubble char-bubble--from-right flex-1">
-          <p class="text-lg text-gray-800 mb-3">内容はこちらの4つです。</p>
+          <p class="bubble-body mb-3">内容はこちらの4つです。</p>
           <ul class="gift-list" aria-label="無料プレゼント4弾">
             <li>
               <i data-lucide="gift" class="w-5 h-5 text-[var(--brand-secondary)] flex-shrink-0 mt-0.5" aria-hidden="true"></i>
@@ -610,24 +825,33 @@
         </div>
       </div>
 
-      <div class="flex flex-row-reverse items-start gap-4 mb-6">
-        <img src="./images/ウパ博士-標準-512×512-透過.png" alt="ウパ博士" class="w-20 h-20 object-contain flex-shrink-0">
+      <div class="flex flex-row-reverse items-start gap-4 mb-8">
+        <div class="char-stack char-stack--upa">
+        <img src="./images/ウパ博士-標準-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">ウパ博士</p>
+        </div>
         <div class="char-bubble char-bubble--from-right flex-1">
-          <p class="text-lg text-gray-800">これらを順番に実践していくことで、あなたは確実に『自走』できるようになります。楽しみにしていてくださいね！</p>
+          <p class="bubble-body">これらを順番に実践していくことで、あなたは確実に『自走』できるようになります。楽しみにしていてくださいね！</p>
         </div>
       </div>
 
-      <div class="flex items-start gap-4 mb-6">
-        <img src="./images/パニっくん-焦り-512×512-透過.png" alt="パニっくん" class="w-20 h-20 object-contain flex-shrink-0">
+      <div class="flex items-start gap-4 mb-8">
+        <div class="char-stack char-stack--panik">
+        <img src="./images/パニっくん-焦り-512×512-透過.png" alt="パニっくん" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">パニっくん</p>
+        </div>
         <div class="char-bubble char-bubble--from-left flex-1">
-          <p class="text-lg text-gray-800">そこまで俺たちのためにステップを用意してくれてるんだね……！これなら途中で迷子になる心配もないよ。博士、俺、本気でついていくから！！</p>
+          <p class="bubble-body">そこまで俺たちのためにステップを用意してくれてるんだね……！これなら途中で迷子になる心配もないよ。博士、俺、本気でついていくから！！</p>
         </div>
       </div>
 
-      <div class="flex flex-row-reverse items-start gap-4 mb-6">
-        <img src="./images/ウパ博士-思考分析-512×512-透過.png" alt="ウパ博士" class="w-20 h-20 object-contain flex-shrink-0">
+      <div class="flex flex-row-reverse items-start gap-4 mb-8">
+        <div class="char-stack char-stack--upa">
+        <img src="./images/ウパ博士-思考、分析-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+        <p class="char-name">ウパ博士</p>
+        </div>
         <div class="char-bubble char-bubble--from-right flex-1">
-          <p class="text-lg text-gray-800">はい！一緒に『AIに怯える側』から『AIを使いこなす側』へ回りましょう。AI時代だからこそ作れる、新しい働き方が必ずあります。これからも私の発信を見逃さないでくださいね。あなたの挑戦を、本気で応援しています！</p>
+          <p class="bubble-body">はい！一緒に『AIに怯える側』から『AIを使いこなす側』へ回りましょう。AI時代だからこそ作れる、新しい働き方が必ずあります。これからも私の発信を見逃さないでくださいね。あなたの挑戦を、本気で応援しています！</p>
         </div>
       </div>
 
@@ -635,6 +859,142 @@
 
   </main>
 
+  <!-- フッター内「公式配布ページ」リンクの href を、この資料の公式URLに必ず差し替えてください -->
+  <footer class="layout-column px-4 pb-10 md:pb-12" role="contentinfo" aria-label="利用条件・著作権">
+    <div class="section-card text-xs md:text-sm text-slate-600 leading-relaxed space-y-3">
+      <h2 class="text-sm font-bold text-slate-800 m-0">利用条件・著作権</h2>
+      <p class="m-0 text-[0.8125rem] text-slate-500">最終更新：2026年4月9日</p>
+      <p class="m-0">本資料（文章・構成・レイアウト・デザイン・画像・HTML/CSS/JavaScript を含みます。以下「本資料」）は、著作者・著作権者である個人事業主<strong class="text-slate-800">佐藤大生</strong>（発信名「ウパ博士」）の著作物です。<strong class="text-slate-800">本条件で明示的に許諾されない複製・改変・再配布は、原則として禁じます。</strong></p>
+      <p class="m-0"><strong class="text-slate-800">法令との関係：</strong>著作権法その他の法令により認められる私的利用・適法な引用その他の利用は、法令の定めるところにより妨げられません。引用や要約の紹介を行う場合は、<strong class="text-slate-800">著作者名・発信名の表示</strong>および<strong class="text-slate-800"><a href="https://example.com/replace-with-official-url" class="text-[var(--brand-secondary)] underline font-semibold hover:opacity-90">この資料の公式配布ページ</a>へのリンク</strong>を、同一の画面・投稿内で可能な範囲で併記してください。可否が判断しづらい場合は、事前に配布元へお問い合わせください。</p>
+      <p class="m-0"><strong class="text-slate-800">同意：</strong>本資料を閲覧・保存し、または複製・共有その他の利用を開始した時点で、当該時点で掲示されている本条件に同意したものとみなします。</p>
+      <p class="m-0 font-semibold text-slate-700">許諾される利用（いずれも無償・個別の書面許諾は不要）</p>
+      <ul class="m-0 pl-5 list-disc space-y-1.5">
+        <li>個人の学習目的での閲覧・印刷（私的利用の範囲内）</li>
+        <li><strong class="text-slate-800">同一の法人または同一の団体</strong>（学校・NPO 等）の構成員が、当該法人・団体の<strong class="text-slate-800">内部の業務・学習</strong>のために行う共有（<strong class="text-slate-800">ファイル内容を改変しないこと</strong>、および著作者の表示・本注意書きを残すことを条件とします）。<strong class="text-slate-800">別人格の法人</strong>（関連会社・グループ会社等）へのファイルのそのままの転送は、本条の「同一団体内の共有」には含まれません。必要な場合は、相手先の担当者へ<strong class="text-slate-800">公式配布ページ</strong>を案内してください。</li>
+        <li><strong class="text-slate-800">改変</strong>とは、文章・図表・デザイン・コードの<strong class="text-slate-800">内容を変更・削除・加工すること</strong>を指します。ファイル形式の変換や圧縮で<strong class="text-slate-800">表現内容が実質同一</strong>に保たれる場合は改変に含めません。変換後のファイルを第三者へ渡す行為は、別途「再配布」に関する条件に従います。</li>
+        <li>SNS・ブログ・メルマガ等で紹介する場合：<strong class="text-slate-800"><a href="https://example.com/replace-with-official-url" class="text-[var(--brand-secondary)] underline font-semibold hover:opacity-90">この資料の公式配布ページ</a>へのリンク</strong>を、第三者が著作者・出典を誤認しないよう<strong class="text-slate-800">明確に表示すること</strong>を条件に、紹介・シェアを認めます。掲載プラットフォームの仕様でリンクが不可のときは、プロフィール・固定投稿等に置ける<strong class="text-slate-800">公式URLの明示</strong>と<strong class="text-slate-800">著作者名・発信名・資料名</strong>の表示で代替できます（可能な限り同一画面内にリンクを掲載してください）。</li>
+        <li>画面キャプチャや動画の一部などで本資料の見た目を示す場合も、上記と同様に<strong class="text-slate-800">出典が分かる表示</strong>および<strong class="text-slate-800">公式配布ページへの導線</strong>（リンクまたは上記代替）を併記してください。</li>
+      </ul>
+      <p class="m-0 font-semibold text-slate-700">禁止事項（違反が判明した場合、法令に基づき差止め・損害賠償の請求その他必要な対応を行うことがあります）</p>
+      <ul class="m-0 pl-5 list-disc space-y-1.5">
+        <li><strong class="text-slate-800">本資料の内容を変更する改変、翻案、第三者への抜粋・要約文の再配布（適法な引用の範囲を超えるもの）、他コンテンツとの不当な合成</strong>（表現の軽微な修正、意図的なデザイン・レイアウトの変更、ロゴ・キャラクター画像の切り出し等を含みます）</li>
+        <li><strong class="text-slate-800">本資料（または実質同一の複製・改変物）を対価（金銭・ポイント等）と交換に提供すること、商用ライセンスの付与、有料講座・教材・テンプレート等の「主たる教材コンテンツ」としての組み込み。</strong>ただし、<strong class="text-slate-800">本資料のファイルを販売・頒布の対象としない</strong>無償の勉強会・社内説明・紹介投稿などで、講師謝礼や会場費のみが発生する程度の場合は、この限りではありません（参加者へファイルを一括配布する場合は、上記「同一団体内の共有」または公式ページ案内に従ってください）。</li>
+        <li>著作者名・本注意書き・出典情報の削除、または第三者の著作物・サービスであると誤認させる表示</li>
+        <li>公式配布ページへのリンク（または上記に定める代替表示）を果たさないままの紹介・転載・ファイルの再配布</li>
+        <li>本注意書きに同意できない形での利用</li>
+      </ul>
+      <p class="m-0 font-semibold text-slate-700">お問い合わせ</p>
+      <p class="m-0">商用利用・二次利用の可否、引用の事前確認などは、<strong class="text-slate-800">配布元で案内している連絡先</strong>（メール・フォーム等）までお願いします。連絡先が掲示されていない場合は、発信チャンネル（SNS 等）のダイレクトメッセージ等でご連絡ください。</p>
+      <p class="m-0 font-semibold text-slate-700">第三者の素材</p>
+      <p class="m-0">本資料が参照する Web フォント、スクリプト（CDN 経由を含む）、アイコン等は、各権利者の利用条件に従います。</p>
+      <p class="m-0 font-semibold text-slate-700">免責</p>
+      <p class="m-0">本資料の内容は、作成時点の情報に基づくものであり、正確性・完全性・最新性を保証するものではありません。利用により生じたいかなる損害についても、法令上認められる範囲を除き著作者・著作権者は責任を負いません。</p>
+      <p class="m-0 font-semibold text-slate-700">準拠法</p>
+      <p class="m-0">本条件の準拠法は<strong class="text-slate-800">日本法</strong>とします。訴訟の必要が生じた場合、著作者・著作権者の住所地を管轄する地方裁判所を第一審の合意管轄裁判所とします。</p>
+      <p class="m-0 pt-3 mt-1 border-t border-slate-200/90 text-slate-500 text-[0.8125rem] leading-relaxed">本条件にご同意いただけない場合は、本資料の利用（閲覧・保存・複製・共有等）を開始しないでください。本条件は<strong class="text-slate-700">変更後の版が本ページに掲示された日以降に開始する利用</strong>に適用されます。それ以前に入手したファイルについては、入手時点の条件に従い、本条で許諾された範囲の私的利用・共有を継続できます。</p>
+    </div>
+  </footer>
+
+  <style>
+    /**
+     * 吹き出し（対話）
+     * - Tailwind CDN は実行時に <style> を挿入するため、同じ <head> 内のルールより後に勝つことがある。
+     * - ここを </body> 直前に置き、.slack-daily-page でスコープして確実に適用する。
+     */
+    body.slack-daily-page {
+      background: linear-gradient(
+        165deg,
+        hsl(192, 62%, 97%) 0%,
+        hsl(196, 52%, 95.5%) 45%,
+        hsl(200, 46%, 94%) 100%
+      ) !important;
+      background-attachment: fixed;
+    }
+    .slack-daily-page .char-stack {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-shrink: 0;
+      width: 4.75rem;
+    }
+    .slack-daily-page .char-name {
+      margin: 0.2rem 0 0;
+      padding: 0;
+      font-size: 0.6875rem;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      color: hsl(210, 11%, 42%);
+      text-align: center;
+      line-height: 1.25;
+      max-width: 5rem;
+    }
+    .slack-daily-page .char-avatar {
+      width: 4rem;
+      height: 4rem;
+      object-fit: contain;
+      flex-shrink: 0;
+      margin-top: 0.15rem;
+      background: transparent;
+      border: none;
+      padding: 0;
+      border-radius: 0;
+      box-shadow: none;
+      filter: drop-shadow(0 2px 6px rgba(15, 23, 42, 0.08));
+    }
+    @media (min-width: 768px) {
+      .slack-daily-page .char-avatar {
+        width: 5rem;
+        height: 5rem;
+      }
+    }
+    .slack-daily-page .char-bubble {
+      position: relative;
+      padding: 1.05rem 1.15rem;
+      border-radius: 1.125rem;
+      background: var(--surface-bg);
+      border: 1px solid #d1d9e0;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+      overflow: visible;
+    }
+    .slack-daily-page .char-bubble--from-left { margin-left: 0.65rem; }
+    .slack-daily-page .char-bubble--from-right { margin-right: 0.65rem; }
+    .slack-daily-page .char-bubble--from-left::before,
+    .slack-daily-page .char-bubble--from-left::after,
+    .slack-daily-page .char-bubble--from-right::before,
+    .slack-daily-page .char-bubble--from-right::after {
+      content: '';
+      position: absolute;
+      top: 1.125rem;
+      width: 0;
+      height: 0;
+      border-style: solid;
+      pointer-events: none;
+    }
+    .slack-daily-page .char-bubble--from-left::before {
+      left: -12px;
+      border-width: 9px 11px 9px 0;
+      border-color: transparent #d1d9e0 transparent transparent;
+    }
+    .slack-daily-page .char-bubble--from-left::after {
+      left: -10px;
+      border-width: 8px 10px 8px 0;
+      border-color: transparent var(--surface-bg) transparent transparent;
+      z-index: 1;
+    }
+    .slack-daily-page .char-bubble--from-right::before {
+      right: -12px;
+      left: auto;
+      border-width: 9px 0 9px 11px;
+      border-color: transparent transparent transparent #d1d9e0;
+    }
+    .slack-daily-page .char-bubble--from-right::after {
+      right: -10px;
+      left: auto;
+      border-width: 8px 0 8px 10px;
+      border-color: transparent transparent transparent var(--surface-bg);
+      z-index: 1;
+    }
+  </style>
   <script>
     lucide.createIcons();
   </script>

@@ -1,25 +1,34 @@
 ---
 name: diagram-upa
-description: ユーザーが用意した台本を起点に、AI関連情報の検証と読者視点のブラッシュアップを経て、パニっくんとウパ博士の会話ラリーをメッセンジャー風HTML（パニっくん左・ウパ博士右、吹き出しは白＋中立ボーダーで話者色分けしない／要点は赤太字・UI名は黒太字）に写し、ヘッダー直後の目次付きで surge.sh にデプロイするスキル（教材型の用語ボックスや「まず覚える3つ」などの挿入はしない）。「台本から図解して」「わかりやすく図解して」「図解して」「図解を作って」など、対話形式の図解HTMLが求められる依頼で使用する。
+description: ユーザーが用意した台本を起点に、AI関連情報の検証と読者視点のブラッシュアップを経て、パニっくんとウパ博士の会話ラリーをメッセンジャー風HTMLに写すスキル。見た目はリポジトリの完成見本（output/ai-daily-report-slack-apr2026/index.html）を複製して遵守する（パニっくん左・ウパ博士右、吹き出しは白＋中立ボーダー、要点は赤太字・UI名は黒太字、main 先頭のインライン目次で読み順はヘッダー直後に相当）。教材型の用語ボックスや「まず覚える3つ」などの挿入はしない。surge.sh にデプロイする。「台本から図解して」「図解して」など対話形式の図解HTML向け。
 ---
 
 # Diagram Upa
 
 ユーザーが用意した**台本**を唯一の主ソースとして、事実・表現を整えたうえで、**技術に詳しくない一般の人**向けの対話形式HTML図解にし、デプロイまで行う。
 
-**図解の理想形**: パニっくんとウパ博士の**会話のラリーを台本どおり**並べること（**台本をそのまま図解にする**イメージ）。**画面ではパニっくんを左・ウパ博士を右**に固定し、チャットのように読めるレイアウトにする。吹き出しは**話者ごとに色を付けず**白＋細い中立ボーダーに統一し、伝えたい強弱は**セリフ内の赤太字（核心）・黒太字（UI名）**で示す。あわせて**ヘッダー直後に目次**（台本の見出し・区切りに対応したアンカー）を置き、長い内容でも全体像を先に示す。教材向けの挿入物——「まず覚える3つ」、独立した「用語解説」ブロック、ナレーション調の見出しだけの説明文、対話と無関係な補足段落——は**置かない**。用語やたとえ、コードの意味づけはすべて**ウパ博士のセリフ**（必要なら続けてパニっくんの反応）として表現する。
+**図解の理想形**: パニっくんとウパ博士の**会話のラリーを台本どおり**並べること（**台本をそのまま図解にする**イメージ）。**画面ではパニっくんを左・ウパ博士を右**に固定し、チャットのように読めるレイアウトにする。吹き出しは**話者ごとに色を付けず**白＋細い中立ボーダーに統一し、伝えたい強弱は**セリフ内の赤太字（核心）・黒太字（UI名）**で示す。あわせて **`main` 要素内の先頭**にインライン目次（`.toc-inline`、台本の見出し・区切りに対応したアンカー）を置き、読み順ではヘッダーの直後に相当する位置で全体像を先に示す（`</header>` と `<main>` の間には置かない。完成見本どおり）。教材向けの挿入物——「まず覚える3つ」、独立した「用語解説」ブロック、ナレーション調の見出しだけの説明文、対話と無関係な補足段落——は**置かない**。用語やたとえ、コードの意味づけはすべて**ウパ博士のセリフ**（必要なら続けてパニっくんの反応）として表現する。
 
 ## 依存
 
-定義の**SSoT**は次のみ（ブランド色・スタイル・キャラの詳細・HTML断片を SKILL.md に複製しない）。
+定義の**SSoT**は次の表どおりに**役割分担**する（長い HTML/CSS の全文は SKILL.md に書かない）。
 
-リポジトリ内の `sample/majiai-diagram/.claude/skills/diagram-maji/` は**別スキル**（名前・参照パスが異なる）。**混同しないこと**。このスキルが読む参照は次の `diagram-upa` パスに固定する。
+**優先順位（食い違ったらこう解決する）**
+
+1. **ビジュアル・寸法・CSS・読み込みバージョン・マークアップ上の具体クラス**の正本は **`output/ai-daily-report-slack-apr2026/index.html` のみ**。新規図解は**必ずこのファイルを複製**してから、タイトル・目次・本文・`id` を差し替える。
+2. **品質チェック（完成後に照らす項目）**の正本は **この SKILL の「[品質チェックリスト](#品質チェックリスト)」**。[references/exemplar.md](references/exemplar.md#quality-checklist) には SKILL へのリンクと制作時の**短い要約**があるが、チェック項目の列挙は **SKILL のみ**とする。
+3. [references/html-structure.md](references/html-structure.md) は **Lucide・対話行の flex 表・コードとセリフのつなぎ**などの**説明用**。[references/exemplar.md](references/exemplar.md) は **構成の型・断片サンプル**（完成見本と同型のマークアップ）。いずれも **1 または 2 と矛盾する具体的な記述**（数値・クラス・余白・検証の解釈など）があれば、**完成見本およびこの SKILL を優先**する。
+
+**ベースにしてはいけないもの**
+
+- **`output/ai-tool-roadmap-apr2026/index.html`**（旧完成見本。レイアウト・配色が現行と異なる）
+- 別スキル `sample/majiai-diagram/.claude/skills/diagram-maji/`（パス・仕様が異なる。**混同しない**）
 
 | 内容 | パス（リポジトリルートから） |
 |------|------------------------------|
-| **完成見本HTML（1ページ全体の実装の型）** | `output/ai-tool-roadmap-apr2026/index.html` |
-| HTML構造・ブランド・Tailwind／Lucide | `.claude/skills/diagram-personal/.claude/skills/diagram-upa/references/html-structure.md` |
-| キャラ役割・トーン・表情・対話HTML例 | `.claude/skills/diagram-personal/.claude/skills/diagram-upa/references/character-usage.md` |
+| **完成見本HTML（実装の型・ビジュアルの唯一の正本）** | `output/ai-daily-report-slack-apr2026/index.html` |
+| HTMLの書き方・Lucide・対話レイアウトの説明（正本は上の完成見本） | `.claude/skills/diagram-personal/.claude/skills/diagram-upa/references/html-structure.md` |
+| キャラ役割・トーン・表情・対話HTML例（マークアップは完成見本と同型） | `.claude/skills/diagram-personal/.claude/skills/diagram-upa/references/character-usage.md` |
 | 用語のやさし替え・たとえ（セリフへの取り込み用。HTML用語ボックス用ではない） | `.claude/skills/diagram-personal/.claude/skills/diagram-upa/references/term-dictionary.md` |
 | 模範・成功パターン（本文・構成の型） | `.claude/skills/diagram-personal/.claude/skills/diagram-upa/references/exemplar.md` |
 
@@ -75,18 +84,19 @@ Task({
 
 台本の**発話順・内容**を主軸にする。図解用に「章立ての要約」や「覚えておく3点」を**新設しない**。
 
-1. **目次**: 台本に見出し・ランキング・大きな話の区切りがある場合は、**ヘッダー直下のインライン目次**（`.toc-inline`）に同じ階層で反映する。各ブロックに `id` を付け、`href` で対応させる。サブ行（プロンプト例など）は [references/html-structure.md](references/html-structure.md) の `.toc-sub` でインデントし、装飾は **Lucide**（例: `list` / `sparkles`）を使う（絵文字は使わない）。
+1. **目次**: 台本に見出し・ランキング・大きな話の区切りがある場合は、**`main` 内の先頭**に置くインライン目次（`.toc-inline`）へ同じ階層で反映する（`</header>` の次が `main` で、その**最初の子**が `.toc-inline` になる。完成見本どおり）。各ブロックに `id` を付け、`href` で対応させる。サブ行（プロンプト例など）は [references/html-structure.md](references/html-structure.md) の `.toc-sub` でインデントし、装飾は **Lucide**（例: `list` / `sparkles`）を使う（絵文字は使わない）。現行の完成見本 HTML にはフローティング目次（別要素の `.toc`）は含まれない。**デフォルトは `.toc-inline` のみ**とする。極端に長い長編でチーム内に別パターンがある場合のみ、[references/exemplar.md](references/exemplar.md) の「成功する図解の構造」の（参考）記述を参照してよい。
 2. **用語・たとえ**: 台本に出てくる用語のやさしい言い換えは、[references/term-dictionary.md](references/term-dictionary.md) を**ブラッシュアップ用**に参照し、**ウパ博士のセリフの中**へ取り込む（独立した用語ボックスは作らない）。
 3. **対話の連なり**: パニっくん（読者代弁）とウパ博士（説明は直接セリフで）のラリーを、台本の並びに近い形でHTMLに写す。**パニっくんは左アバター、ウパ博士は右アバター**のメッセンジャー風に固定する。役割・トーン・表情は [references/character-usage.md](references/character-usage.md) に従う。
 4. **視覚補助のみ**: 台本の間にダイアグラム・コード・箇条書きを置く場合は、**直前のウパ博士（または台本どおりの話者）の発話**で文脈がつながるようにし、教材用の見出し＋解説だけのブロックを増やさない。
 
 ### 5. HTML（第1版）
 
-- [references/html-structure.md](references/html-structure.md) に従い、Tailwind CDN・Lucide・ブランドコンポーネントで `index.html` を生成する。**全体の見た目・目次・セクションの組み方はリポジトリ内の完成見本** `output/ai-tool-roadmap-apr2026/index.html` と揃える（タイトル・本文は台本に合わせてよい）。
-- **ヘッダー直後に `.toc-inline` を置く**（台本に章立てがほぼない短編では、目次を「導入／本題／まとめ」など最小限の3項目にとどめてよい）。
-- **本文は対話（吹き出し）中心**。パニっくん行は `char-bubble char-bubble--from-left`、ウパ博士行は `flex-row-reverse` と `char-bubble char-bubble--from-right`。吹き出しの背景・枠で話者色を分けない（白＋細い中立ボーダーは [references/html-structure.md](references/html-structure.md) に従う）。要点は**赤太字**（`.bubble-key` 等）、ボタン名・UIラベルは**黒太字**（`.bubble-ui` 等）で示す。コードや図があるときは、その意味づけも**吹き出し内のセリフ**に含める（別パーツの「解説コーナー」に逃がさない）。
-- **長文吹き出しの改行（可読性）**: 1つの吹き出しに文章量が多いときは、**台本の発話を分割したり内容を増やさず**、HTML 上だけ**意味の区切り**（結論→理由、話題の転換、「例えば…」の直前後、列挙のかたまりの境目など）で読みやすくする。**同一 `<p>` 内なら `<br>`** で改行する。塊がはっきり分かれる場合は**同一 `.char-bubble` 内に `<p>` を複数**置いてもよい（クラスは [references/html-structure.md](references/html-structure.md) の既存の段落と揃える）。**新しい発話としての吹き出しを増やす**のは台本のラリーに合うときだけとし、読みやすさ目的だけで無関係に行を分けない。
-- レイアウト・装飾の型は [references/exemplar.md](references/exemplar.md) を参照する。
+- **必ず**リポジトリ内の完成見本 **`output/ai-daily-report-slack-apr2026/index.html` を複製**して `index.html` の土台とする。ゼロから書き起こしたり、旧完成見本や `max-w-4xl` の広い記事レイアウトに戻さない。
+- 複製後、`<title>`・ヘッダー・`.toc-inline`・`main` 内の章見出し・対話・補助ブロックだけを台本に合わせて差し替える。**`<head>` の CSS（`:root`・`.layout-column` 等）と、`</body>` 直前の吹き出し用 `<style>`・Lucide 初期化は完成見本のまま維持**する（Tailwind CDN より後に吹き出し CSS が効く順序を崩さない）。
+- [references/html-structure.md](references/html-structure.md) は **Lucide の data 属性・対話行の flex 表**などの参照用。[references/exemplar.md](references/exemplar.md) は **目次・対話の断片サンプル**用。いずれも**見た目の数値は完成見本が正**。
+- **`main` の最初の子として `.toc-inline` を置く**（台本に章立てがほぼない短編では、目次を「導入／本題／まとめ」など**最小3項目**にとどめてよい。[references/exemplar.md](references/exemplar.md) に同じ緩和を記載）。
+- **本文は対話（吹き出し）中心**。**パニっくん**は `.char-stack--panik`＋`char-bubble char-bubble--from-left`、**ウパ博士**は `flex-row-reverse`＋`.char-stack--upa`＋`char-bubble char-bubble--from-right`。本文は **`.bubble-body`**（完成見本どおり）。吹き出しで話者色分けしない（白＋中立ボーダー）。要点は**赤太字**（`.bubble-key`）、UI 名は**黒太字**（`.bubble-ui`）。コードや図の意味づけは**吹き出し内のセリフ**に含める。
+- **長文吹き出しの改行（可読性）**: 台本の発話を増やさず、HTML 上だけ意味の区切りで読みやすくする。**同一 `.bubble-body` 内なら `<br>`**、塊が分かれる場合は同一吹き出し内に **`<p class="bubble-body">` を複数**（完成見本の複数段落パターンに合わせる）。**新しい吹き出しに分ける**のは台本のラリーに合うときだけ。
 
 ### 6. 読者視点の台本レビュー（サブエージェント）
 
@@ -170,10 +180,12 @@ cd "$DEPLOY_DIR" && surge . --domain {ドメイン名}.surge.sh
 ### デザイン
 
 - [ ] Lucide iconを使用（絵文字禁止）
-- [ ] ヘッダー・目次リンクなど**ブランド色**は [html-structure.md](references/html-structure.md) に従う一方、**対話の吹き出しに話者別の背景色・色付き枠を付けていない**（白＋中立ボーダーのみ）
+- [ ] **レイアウト・フォントサイズ・ヘッダー／目次／カード／対話行**が完成見本 `output/ai-daily-report-slack-apr2026/index.html` と同系統（例: `.layout-column`、`.char-stack`＋`.char-avatar`＋`.char-name`、本文は `.bubble-body`、吹き出しスタイルのページスコープなど）
+- [ ] **ブランド色・CSS・Lucide の URL**は完成見本ファイルを**そのまま維持**している（[html-structure.md](references/html-structure.md) の説明と食い違う場合は完成見本側が正）
+- [ ] **対話の吹き出しに話者別の背景色・色付き枠を付けていない**（白＋中立ボーダーのみ）
 - [ ] 最重要の一言・結論は**赤太字**、画面操作の指し示しは**黒太字**で区別し、赤の濫用をしていない
-- [ ] **パニっくんは左・ウパ博士は右**（`char-bubble--from-left` / `char-bubble--from-right`）で配置されている
-- [ ] **冒頭にインライン目次**があり、本文の `id` とリンクが対応している
+- [ ] **パニっくんは左・ウパ博士は右**（`.char-stack`＋`char-bubble--from-left` / `flex-row-reverse`＋`.char-stack`＋`char-bubble--from-right`）で配置されている
+- [ ] **インライン目次**（`.toc-inline`）が **`main` 内の先頭**にあり、本文の `id` とリンクが対応している
 - [ ] **長いセリフ**は意味の区切りで `<br>` または同一吹き出し内の複数 `<p>` により改行・段落分けし、スキャンしやすくしている（台本の発話数を勝手に増やしていない）
 - [ ] スマホでも読みやすいレスポンシブ対応
 
@@ -181,5 +193,6 @@ cd "$DEPLOY_DIR" && surge . --domain {ドメイン名}.surge.sh
 
 ## 模範解答
 
-- **完成見本（リポジトリ内の実ファイル）**: `output/ai-tool-roadmap-apr2026/index.html`
-- 断片の型・説明 → [references/exemplar.md](references/exemplar.md)
+- **完成見本（コピー元・ビジュアルの唯一の正本）**: `output/ai-daily-report-slack-apr2026/index.html`
+- 構成の型・HTML 断片サンプル → [references/exemplar.md](references/exemplar.md)
+- **品質チェックの正本** → この SKILL の [品質チェックリスト](#品質チェックリスト)（[exemplar 側](references/exemplar.md#quality-checklist)は SKILL へのリンクと制作時の**短い要約**のみ。項目の複写はしない）

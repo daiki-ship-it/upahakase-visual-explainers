@@ -1,267 +1,25 @@
 # HTML構造ガイド
 
-**完成見本**: 仕様どおりに組み上がった実ページはリポジトリの **`output/ai-tool-roadmap-apr2026/index.html`** を参照する（この章のテンプレートと照らし合わせる）。
+**完成見本（ビジュアル・寸法のSSOT）**: リポジトリの **`output/ai-daily-report-slack-apr2026/index.html`**。テキストサイズ、`.layout-column`、ヘッダー、`.toc-inline`、`.section-card`、`.char-stack` / `.char-avatar` / `.char-name`、`.bubble-body`、章見出し `.body-chapter-heading`、ブランドの HSL、Lucide の読み込みバージョンとアイコン寸法、ページ背景、吹き出し用の `</body>` 直前スタイルなどは**すべてこのファイルに合わせる**。
 
-## 基本テンプレート
+このファイルは **Lucide の書き方・対話行の flex 表・コードとセリフのつなぎ**の参照用である。**長い「基本テンプレート」ブロックは、旧デザイン（紫ピンク・`max-w-4xl`・`lucide@latest` 等）が完成見本と矛盾するため削除した。** 数値やクラスが本文中の例と完成見本で食い違う場合は**常に完成見本を優先**する。
 
-```html
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>【図解タイトル】- ウパ博士｜AI業務設計の専門家</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    /* ブランドカラー：パニっくん＝紫 / ウパ博士＝ピンク（ヘッダー・目次・アクセント。吹き出し本体は中立のまま） */
-    :root {
-      --brand-primary: hsl(328, 73%, 52%);
-      --brand-secondary: hsl(262, 55%, 46%);
-      --brand-gradient: linear-gradient(90deg, hsl(262, 58%, 42%), hsl(328, 75%, 56%));
-    }
-    
-    body {
-      font-family: 'Noto Sans JP', 'Inter', sans-serif;
-    }
+## 新規 `index.html` の作り方
 
-    /* ヘッダーグラデーション */
-    .header-gradient {
-      background: var(--brand-gradient);
-    }
+### 手順
 
-    /* セクションカード */
-    .section-card {
-      background: white;
-      border-radius: 1rem;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-      padding: 2rem;
-      margin-bottom: 2rem;
-    }
+1. **`output/ai-daily-report-slack-apr2026/index.html` を丸ごと複製**して編集の起点にする。
+2. 次だけ台本に合わせて差し替える: `<title>`、`<header>` の見出し、`.toc-inline` のリンク列、`main` 内の `h2.body-chapter-heading` および各 `section.section-card` の対話・図・手順ブロック。
+3. **原則として触らない**: Tailwind／Lucide の `<script>`（**`@latest` に変更しない**。完成見本と同じピン留め URL を維持）、Google Fonts の `<link>`、`<head>` 内の `<style>` 全体、`body` のクラス、**`</body>` 直前の `<style>`（`.slack-daily-page` スコープの吹き出し）** と続く `lucide.createIcons()` のスクリプト。順序を入れ替えると Tailwind が吹き出し用 CSS を上書きし、見た目が崩れる。
 
-    /* 用語解説ボックス */
-    .term-explain {
-      background: linear-gradient(135deg, #fdf2f8 0%, #fae8ff 100%);
-      border-left: 4px solid var(--brand-secondary);
-      padding: 1.5rem;
-      border-radius: 0.75rem;
-      margin: 1.5rem 0;
-    }
+### diagram-upa で使わないパーツ
 
-    /*
-     * キャラクター吹き出し（メッセンジャー風）
-     * — パニっくん／ウパ博士とも背景色は付けない（白＋細い中立ボーダー）。強調は本文の span で行う。
-     * — パニっくん：アバター左＋吹き出し右（尾巴は左向き）
-     * — ウパ博士：アバター右＋吹き出し左（flex-row-reverse、尾巴は右向き）
-     */
-    .char-bubble {
-      position: relative;
-      padding: 1.5rem;
-      border-radius: 1rem;
-      background: #ffffff;
-      border: 1px solid hsl(220, 14%, 82%);
-      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
-    }
-    .char-bubble::before {
-      content: '';
-      position: absolute;
-      top: 20px;
-      border-width: 10px;
-      border-style: solid;
-    }
-    .char-bubble--from-left {
-      margin-left: 1rem;
-    }
-    .char-bubble--from-left::before {
-      left: -10px;
-      border-color: transparent hsl(220, 14%, 82%) transparent transparent;
-    }
-    .char-bubble--from-right {
-      margin-right: 1rem;
-    }
-    .char-bubble--from-right::before {
-      right: -10px;
-      left: auto;
-      border-color: transparent transparent transparent hsl(220, 14%, 82%);
-    }
+- **独立した「用語解説」ボックス**（`.term-explain` など）: diagram-upa では**置かない**。用語の言い換えは [term-dictionary.md](term-dictionary.md) を参照しつつ、**セリフの中**に書く（SKILL・exemplar）。
 
-    /* 吹き出し内の強調（背景色は使わずテキストで差をつける） */
-    .bubble-key {
-      font-weight: 700;
-      color: #dc2626;
-    }
-    .bubble-ui {
-      font-weight: 700;
-      color: #111827;
-    }
+### 使ってはいけないベース
 
-    /* 重要度バッジ */
-    .badge-essential {
-      background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
-      color: white;
-      padding: 0.25rem 0.75rem;
-      border-radius: 9999px;
-      font-size: 0.875rem;
-      font-weight: 600;
-    }
-    .badge-recommended {
-      background: linear-gradient(135deg, var(--brand-secondary) 0%, var(--brand-primary) 100%);
-      color: white;
-      padding: 0.25rem 0.75rem;
-      border-radius: 9999px;
-      font-size: 0.875rem;
-      font-weight: 600;
-    }
-    .badge-optional {
-      background: linear-gradient(135deg, #6b7280 0%, #9ca3af 100%);
-      color: white;
-      padding: 0.25rem 0.75rem;
-      border-radius: 9999px;
-      font-size: 0.875rem;
-      font-weight: 600;
-    }
-
-    /* コードブロック */
-    .code-block {
-      background: #1e293b;
-      color: #e2e8f0;
-      padding: 1.5rem;
-      border-radius: 0.75rem;
-      overflow-x: auto;
-      font-family: 'Fira Code', monospace;
-      font-size: 0.875rem;
-      line-height: 1.7;
-    }
-
-    /* 冒頭インライン目次（記事直後・全幅で読める） */
-    .toc-inline {
-      background: white;
-      border-radius: 1rem;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-      padding: 1.75rem 2rem;
-      margin-bottom: 2rem;
-    }
-    .toc-inline h2 {
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: #1f2937;
-      margin-bottom: 1.25rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .toc-inline nav > ol {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      counter-reset: toc;
-    }
-    .toc-inline nav > ol > li {
-      counter-increment: toc;
-      margin-bottom: 0.85rem;
-      line-height: 1.5;
-    }
-    .toc-inline nav > ol > li > a {
-      color: #374151;
-      font-weight: 500;
-      text-decoration: none;
-    }
-    .toc-inline nav > ol > li > a:hover {
-      color: var(--brand-secondary);
-      text-decoration: underline;
-    }
-    .toc-inline .toc-sub {
-      list-style: none;
-      padding: 0.35rem 0 0 1.5rem;
-      margin: 0;
-    }
-    .toc-inline .toc-sub li {
-      margin-bottom: 0.4rem;
-      display: flex;
-      align-items: flex-start;
-      gap: 0.35rem;
-      font-size: 0.9375rem;
-      color: hsl(262, 48%, 36%);
-    }
-    .toc-inline .toc-sub a {
-      color: inherit;
-      font-weight: 400;
-      text-decoration: none;
-    }
-    .toc-inline .toc-sub a:hover {
-      text-decoration: underline;
-      color: var(--brand-secondary);
-    }
-    .toc-inline .toc-sub .toc-sub-icon {
-      flex-shrink: 0;
-      margin-top: 0.15rem;
-      color: hsl(328, 55%, 48%);
-    }
-
-    /* 目次（長編向け・デスクトップ固定。インライン目次と併用する場合は任意） */
-    .toc {
-      position: fixed;
-      right: 2rem;
-      top: 50%;
-      transform: translateY(-50%);
-      background: white;
-      padding: 1rem;
-      border-radius: 0.75rem;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-      max-height: 80vh;
-      overflow-y: auto;
-      z-index: 50;
-    }
-    @media (max-width: 1280px) {
-      .toc { display: none; }
-    }
-  </style>
-</head>
-<body class="bg-gray-50">
-  <!-- ヘッダー -->
-  <header class="header-gradient text-white py-8">
-    <div class="max-w-4xl mx-auto px-4">
-      <h1 class="text-3xl md:text-4xl font-bold">【タイトル】</h1>
-      <p class="mt-2 text-lg opacity-90">サブタイトル</p>
-    </div>
-  </header>
-
-  <!-- メインコンテンツ -->
-  <main class="max-w-4xl mx-auto px-4 py-8">
-    <!-- 冒頭目次：台本の見出し・区切りに合わせて id とリンクを対応させる -->
-    <aside class="toc-inline" aria-label="この記事の目次">
-      <h2>
-        <i data-lucide="list" class="w-6 h-6 text-[var(--brand-secondary)]"></i>
-        目次
-      </h2>
-      <nav>
-        <ol>
-          <li><a href="#sec-intro">導入：テーマの一言</a></li>
-          <li>
-            <a href="#sec-topic-a">本題の見出し</a>
-            <ul class="toc-sub">
-              <li>
-                <i data-lucide="sparkles" class="w-4 h-4 toc-sub-icon" aria-hidden="true"></i>
-                <a href="#sec-topic-a-prompt">補足行（プロンプト例など）へのジャンプ</a>
-              </li>
-            </ul>
-          </li>
-          <li><a href="#sec-outro">まとめ</a></li>
-        </ol>
-      </nav>
-    </aside>
-    <!-- 以降：対話ブロック（各セクションのラッパーに id を付与） -->
-  </main>
-
-  <!-- Lucide初期化 -->
-  <script>
-    lucide.createIcons();
-  </script>
-</body>
-</html>
-```
+- **`output/ai-tool-roadmap-apr2026/index.html`**（旧完成見本）
+- **`lucide@latest`**（再現性がない）
 
 ---
 
@@ -271,25 +29,33 @@
 
 | 話者 | 行の Flex | 子要素の順 | 吹き出しの修飾 |
 |------|-----------|------------|----------------|
-| パニっくん | `flex items-start gap-4`（既定の左→右） | 画像 → 吹き出し | `char-bubble char-bubble--from-left` |
-| ウパ博士 | `flex flex-row-reverse items-start gap-4` | 画像 → 吹き出し（視覚的には右端にアバター） | `char-bubble char-bubble--from-right` |
+| パニっくん | `flex items-start gap-4`（既定の左→右） | `.char-stack`（アバター＋名前）→ 吹き出し | `char-bubble char-bubble--from-left` |
+| ウパ博士 | `flex flex-row-reverse items-start gap-4` | 同上（視覚的には右端にアバター） | `char-bubble char-bubble--from-right` |
 
-### 最小例
+### 最小例（完成見本と同型）
+
+アバター直下に名前を出す **`.char-stack`** と、本文用 **`.bubble-body`** を使う。行の縦余白は完成見本に合わせる（例: `mb-8`）。しっぽ付き吹き出しの CSS は完成見本の `</body>` 直前ブロックに依存する。
 
 ```html
 <!-- パニっくん -->
-<div class="flex items-start gap-4 mb-6" id="sec-example-pani">
-  <img src="./images/パニっくん-疑っている-512×512-透過.png" alt="パニっくん" class="w-20 h-20 object-contain flex-shrink-0">
+<div class="flex items-start gap-4 mb-8" id="sec-example-pani">
+  <div class="char-stack char-stack--panik">
+    <img src="./images/パニっくん-疑っている-512×512-透過.png" alt="パニっくん" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+    <p class="char-name">パニっくん</p>
+  </div>
   <div class="char-bubble char-bubble--from-left flex-1">
-    <p class="text-lg text-gray-800">…</p>
+    <p class="bubble-body">…</p>
   </div>
 </div>
 
 <!-- ウパ博士 -->
-<div class="flex flex-row-reverse items-start gap-4 mb-6" id="sec-example-upa">
-  <img src="./images/ウパ博士-諭す-512×512-透過.png" alt="ウパ博士" class="w-20 h-20 object-contain flex-shrink-0">
+<div class="flex flex-row-reverse items-start gap-4 mb-8" id="sec-example-upa">
+  <div class="char-stack char-stack--upa">
+    <img src="./images/ウパ博士-諭す-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+    <p class="char-name">ウパ博士</p>
+  </div>
   <div class="char-bubble char-bubble--from-right flex-1">
-    <p class="text-lg text-gray-800">…</p>
+    <p class="bubble-body">…</p>
   </div>
 </div>
 ```
@@ -304,11 +70,17 @@
 
 ## Lucide Icon の使い方
 
+### 読み込み（diagram-upa）
+
+完成見本と**同じ UMD URL・バージョン**を使う（例: `https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js`）。ページ末尾で `lucide.createIcons();` を実行する。
+
 ### 基本構文
 
 ```html
 <i data-lucide="icon-name" class="w-6 h-6"></i>
 ```
+
+**寸法**: 汎用アイコンは `w-6 h-6` のこともあるが、**`.toc-inline` 内は完成見本に合わせる**——目次見出しの `list` は `w-4 h-4`、`.toc-sub` 内の `sparkles` は `w-3.5 h-3.5` が目安（完成見本のマークアップをコピーするのが確実）。
 
 ### よく使うアイコン
 
@@ -332,19 +104,21 @@
 | 質問 | `help-circle` | `<i data-lucide="help-circle" class="w-6 h-6 text-blue-500"></i>` |
 | 本 | `book-open` | `<i data-lucide="book-open" class="w-6 h-6 text-indigo-500"></i>` |
 | 学習 | `graduation-cap` | `<i data-lucide="graduation-cap" class="w-6 h-6 text-purple-500"></i>` |
-| 目次見出し | `list` | `<i data-lucide="list" class="w-6 h-6 text-[var(--brand-secondary)]"></i>` |
-| 目次サブ行（プロンプト等） | `sparkles` | `<i data-lucide="sparkles" class="w-4 h-4 toc-sub-icon"></i>` |
+| 目次見出し | `list` | `<i data-lucide="list" class="w-4 h-4 text-[var(--brand-secondary)]" aria-hidden="true"></i>` |
+| 目次サブ行（プロンプト等） | `sparkles` | `<i data-lucide="sparkles" class="w-3.5 h-3.5 toc-sub-icon" aria-hidden="true"></i>` |
 | ツール | `wrench` | `<i data-lucide="wrench" class="w-6 h-6 text-gray-600"></i>` |
 | プレイ | `play` | `<i data-lucide="play" class="w-6 h-6 text-green-500"></i>` |
 | 停止 | `square` | `<i data-lucide="square" class="w-6 h-6 text-red-500"></i>` |
 
-### セクションヘッダーでの使用例
+### セクションヘッダーでの使用例（参考）
+
+diagram-upa の標準図解では、**完成見本に無い大きなアイコン付きカード見出しを新設しない**方針（対話と章見出しが主）。フローチャート等でアイコンを並べる場合の HTML 例としてのみ参照する。
 
 ```html
 <div class="section-card">
   <div class="flex items-center gap-3 mb-6">
-    <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
-      <i data-lucide="shield-check" class="w-6 h-6 text-purple-600"></i>
+    <div class="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center">
+      <i data-lucide="shield-check" class="w-6 h-6 text-[var(--brand-secondary)]"></i>
     </div>
     <div>
       <h2 class="text-2xl font-bold text-gray-800">セクションタイトル</h2>
@@ -379,10 +153,13 @@ hook.onPreToolUse((event) => {
 
 ```html
 <div class="flex flex-row-reverse items-start gap-4 mb-4">
-  <img src="./images/ウパ博士-標準-512×512-透過.png"
-       alt="ウパ博士" class="w-20 h-20 object-contain flex-shrink-0">
+  <div class="char-stack char-stack--upa">
+    <img src="./images/ウパ博士-標準-512×512-透過.png"
+         alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+    <p class="char-name">ウパ博士</p>
+  </div>
   <div class="char-bubble char-bubble--from-right flex-1">
-    <p class="text-lg text-gray-800">
+    <p class="bubble-body">
       ここでは、Writeツール——ファイルを書き込む道具——が使われそうになったら、
       <span class="bubble-key">許可しない</span>と返すルールを書いています。
     </p>
@@ -399,7 +176,7 @@ hook.onPreToolUse((event) => {
 </div>
 ```
 
-**補足**: 台本がもともと教材調で「このコードがやること」見出し＋本文になっている場合は、台本に合わせてよい。
+**補足**: 台本がもともと教材調で「このコードがやること」見出し＋本文になっている場合は、台本に合わせてよい。プロンプト貼り付け UI が必要な場合は完成見本の `.script-prompt-block` 等を優先する。
 
 ---
 
@@ -425,3 +202,5 @@ hook.onPreToolUse((event) => {
   </div>
 </div>
 ```
+
+色面は吹き出しとは別の図解パーツ向け。対話の吹き出し本体に話者色を付けないルールとは切り離して使う。

@@ -14,7 +14,7 @@
 - **会話以外のテキストを増やさない**: 台本にない「まず覚える3つ」「用語をここで一括解説」などの教材パーツを、図解用に挿入しない。
 - **台本のラリーを軸にする**: 発話順・役割は台本を正とし、見出しだけの説明ブロックで置き換えない。
 - **たとえ話**: 必ずしもウパ博士に限らないが、台本にないたとえ枠を新設しない。説明にたとえを使うときは**登場人物の吹き出し内**に収める。
-- **吹き出しの色**: パニっくん・ウパ博士の吹き出しに、話者別の背景色や色付きの太枠を付けない（白＋細い中立ボーダーは [html-structure.md](html-structure.md) の `.char-bubble`）。**強調はセリフ内のテキスト**で行う——結論・核心は**赤太字**（`.bubble-key`）、ボタン名・メニュー等は**黒太字**（`.bubble-ui`）。
+- **吹き出しの色**: パニっくん・ウパ博士の吹き出しに、話者別の背景色や色付きの太枠を付けない（白＋細い中立ボーダー。スタイルは完成見本 `output/ai-daily-report-slack-apr2026/index.html` の `</body>` 直前 CSS に依存）。**強調はセリフ内のテキスト**で行う——結論・核心は**赤太字**（`.bubble-key`）、ボタン名・メニュー等は**黒太字**（`.bubble-ui`）。
 
 ---
 
@@ -41,33 +41,37 @@
 |-----|----------|----------|
 | 標準 | `ウパ博士-標準-512×512-透過.png` | 通常の説明 |
 | 諭す | `ウパ博士-諭す-512×512-透過.png` | 重要なポイント、本質を伝える |
-| 思考分析 | `ウパ博士-思考分析-512×512-透過.png` | 考え中、深い話 |
+| 思考、分析 | `ウパ博士-思考、分析-512×512-透過.png` | 考え中、深い話（ファイル名の読点「、」を含める） |
 | 真顔 | `ウパ博士-真顔-512×512-透過.png` | 厳しい指摘 |
 
 ---
 
 ## 対話パターン
 
+マークアップは **完成見本と同型**（`.char-stack`＋`.char-avatar`＋`.char-name`、本文は `.bubble-body`、行間は `mb-8`）。詳細な HTML 断片は [exemplar.md](exemplar.md) も参照。
+
 ### 1. 導入パターン（疑問→答え）
 
 ```html
 <!-- パニっくん: 疑問を投げかける（左アバター） -->
-<div class="flex items-start gap-4 mb-6">
-  <img src="./images/パニっくん-疑っている-512×512-透過.png" 
-       alt="パニっくん" class="w-20 h-20 object-contain flex-shrink-0">
+<div class="flex items-start gap-4 mb-8">
+  <div class="char-stack char-stack--panik">
+    <img src="./images/パニっくん-疑っている-512×512-透過.png" alt="パニっくん" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+    <p class="char-name">パニっくん</p>
+  </div>
   <div class="char-bubble char-bubble--from-left flex-1">
-    <p class="text-lg text-gray-800">
-      「フック」って何ですか？プログラムに釣り針でも刺すんですか？
-    </p>
+    <p class="bubble-body">「フック」って何ですか？プログラムに釣り針でも刺すんですか？</p>
   </div>
 </div>
 
 <!-- ウパ博士: 本質を説明（右アバター） -->
-<div class="flex flex-row-reverse items-start gap-4 mb-6">
-  <img src="./images/ウパ博士-諭す-512×512-透過.png" 
-       alt="ウパ博士" class="w-20 h-20 object-contain flex-shrink-0">
+<div class="flex flex-row-reverse items-start gap-4 mb-8">
+  <div class="char-stack char-stack--upa">
+    <img src="./images/ウパ博士-諭す-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+    <p class="char-name">ウパ博士</p>
+  </div>
   <div class="char-bubble char-bubble--from-right flex-1">
-    <p class="text-lg text-gray-800">
+    <p class="bubble-body">
       良い質問ですね、パニさん。フックとは<span class="bubble-ui">「割り込みポイント」</span>のことです。
       会社のセキュリティゲートを想像してください。<span class="bubble-key">通る前に止めて確認する——それがフックの役割</span>に近いです。
     </p>
@@ -78,11 +82,13 @@
 ### 2. 驚きパターン（発見の瞬間）
 
 ```html
-<div class="flex items-start gap-4 mb-6">
-  <img src="./images/パニっくん-驚き-512×512-透過.png" 
-       alt="パニっくん" class="w-20 h-20 object-contain flex-shrink-0">
+<div class="flex items-start gap-4 mb-8">
+  <div class="char-stack char-stack--panik">
+    <img src="./images/パニっくん-驚き-512×512-透過.png" alt="パニっくん" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+    <p class="char-name">パニっくん</p>
+  </div>
   <div class="char-bubble char-bubble--from-left flex-1">
-    <p class="text-lg text-gray-800">
+    <p class="bubble-body">
       マジ？　つまり、<span class="bubble-key">AIが何かする前に「ちょっと待って！」って止められる</span>んですね！
     </p>
   </div>
@@ -92,23 +98,23 @@
 ### 3. まとめパターン（理解の確認）
 
 ```html
-<div class="flex flex-row-reverse items-start gap-4 mb-6">
-  <img src="./images/ウパ博士-標準-512×512-透過.png" 
-       alt="ウパ博士" class="w-20 h-20 object-contain flex-shrink-0">
+<div class="flex flex-row-reverse items-start gap-4 mb-8">
+  <div class="char-stack char-stack--upa">
+    <img src="./images/ウパ博士-標準-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+    <p class="char-name">ウパ博士</p>
+  </div>
   <div class="char-bubble char-bubble--from-right flex-1">
-    <p class="text-lg text-gray-800">
-      その通りです。整理すると、フックには<span class="bubble-key">3つの役割</span>があります。
-    </p>
+    <p class="bubble-body">その通りです。整理すると、フックには<span class="bubble-key">3つの役割</span>があります。</p>
   </div>
 </div>
 
-<div class="flex items-start gap-4 mb-6">
-  <img src="./images/パニっくん-調子に乗ってる-512×512-透過.png" 
-       alt="パニっくん" class="w-20 h-20 object-contain flex-shrink-0">
+<div class="flex items-start gap-4 mb-8">
+  <div class="char-stack char-stack--panik">
+    <img src="./images/パニっくん-調子に乗ってる-512×512-透過.png" alt="パニっくん" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+    <p class="char-name">パニっくん</p>
+  </div>
   <div class="char-bubble char-bubble--from-left flex-1">
-    <p class="text-lg text-gray-800">
-      これでボクも次期OpenAIのCEO候補ですね！
-    </p>
+    <p class="bubble-body">これでボクも次期OpenAIのCEO候補ですね！</p>
   </div>
 </div>
 ```
@@ -148,12 +154,13 @@
 
 対話は**チャット画面と同じ読み方**にそろえる。話者と画面位置の対応を崩さない。
 
-1. **パニっくん**: **左アバター**。行は `flex items-start gap-4`。吹き出しは `char-bubble char-bubble--from-left`（尾巴は左＝アバター側）。
-2. **ウパ博士**: **右アバター**。行は `flex flex-row-reverse items-start gap-4`。吹き出しは `char-bubble char-bubble--from-right`（尾巴は右＝アバター側）。
-3. **画像サイズ**: `w-20 h-20`（80px）が基本
-4. **余白**: `gap-4`、`mb-6` で統一
+1. **パニっくん**: **左アバター**。行は `flex items-start gap-4`。`.char-stack--panik` でアバターと `.char-name` を縦積み。吹き出しは `char-bubble char-bubble--from-left`。
+2. **ウパ博士**: **右アバター**。行は `flex flex-row-reverse items-start gap-4`。`.char-stack--upa` と `char-bubble char-bubble--from-right`。
+3. **画像**: `class="char-avatar"`（実寸は完成見本の CSS。`md` 以上で 5rem など）。**裸の `w-20 h-20` だけの img は使わない**。
+4. **本文**: 吹き出し内は **`.bubble-body`**（`text-lg` 直書きにしない）。
+5. **余白**: `gap-4`、行と行の間は完成見本に合わせる（例: `mb-8`）。
 
-詳細なマークアップと CSS は [html-structure.md](html-structure.md) の「対話行のレイアウト」を参照する。
+詳細は [html-structure.md](html-structure.md) の「対話行のレイアウト」、見た目の正本は完成見本 HTML。
 
 ---
 

@@ -1,33 +1,52 @@
 # 模範解答パターン（台本忠実・対話中心）
 
-## 完成見本（1ファイル全体）
+## 参照の優先順位（SSOT）
 
-リポジトリルートから **`output/ai-tool-roadmap-apr2026/index.html`** を開く。ヘッダー・`.toc-inline`・`.section-card`・対話行・CSS 変数・Lucide の使い方など、**このリポジトリで目指す図解の実装見本**とする（断片の説明はこのファイルの下に続く）。
+[SKILL.md](../SKILL.md) の「依存」と同じ解決順を、ここでも短く示す。
+
+1. **唯一のビジュアル正本**: リポジトリの **`output/ai-daily-report-slack-apr2026/index.html`**（必ず複製してから編集する）。
+2. **品質チェックの正本**: [SKILL.md](../SKILL.md) の「品質チェックリスト」。チェック項目の列挙は SKILL のみ（このファイル末尾はリンク＋要約のみ）。
+3. **説明・断片**: **この exemplar.md** と [html-structure.md](html-structure.md)。構成の型・HTML 断片・Lucide の書き方など。**1 または 2 と食い違う具体的な記述**（クラス・余白・数値・検証の解釈）は、**完成見本および SKILL を優先**する。
+
+## 完成見本（1ファイル全体・ビジュアルのSSOT）
+
+リポジトリルートから **`output/ai-daily-report-slack-apr2026/index.html`** を開く。**テキストの大きさ、配置、色、余白、フォント、ヘッダー、目次、セクションカード、対話行（`.char-stack`／`.bubble-body`）、章見出し、Lucide のサイズ感・読み込み URL、ページ背景、`</body>` 直前の吹き出し用 CSS**など、**これから作る図解の見た目はすべてこのファイルに合わせる**（新規はこの HTML を複製して中身だけ差し替えるのが最短。断片の説明はこのファイルの下に続く）。
+
+**レイアウトの要点（完成見本に実装済み）**
+
+- **中央の狭いカラム**: `body` 直下のヘッダーと `main` は `.layout-column` で max-width を抑え、スマホ縦読みに近い幅に統一する。
+- **ページ背景**: 完成見本どおり、グラデーション地＋必要ならページ用クラスで吹き出し用 CSS をスコープする（Tailwind CDN との詳細は完成見本の `</body>` 直前コメント参照）。
+- **ヘッダー**: タイトルはコンパクト（例: `text-base md:text-lg`）。旧見本の特大見出し＋サブタイトル行に自動で戻さない。
+- **章立て**: 大見出しは `main` 直下の `.body-chapter-heading`（左赤ライン）、その下に `.section-card` で対話ブロックを包むパターンが完成見本の型。
+- **対話行**: アバターは `.char-stack`（`.char-stack--panik` / `.char-stack--upa`）で縦積みし、`.char-avatar`（幅は完成見本の CSS に従う）とその下に `.char-name` の実テキスト。吹き出し内の本文は **`.bubble-body`**（`text-lg` 直書きにしない）。行間は `mb-6` ではなく完成見本に合わせる（例: `mb-8`）。
+- **Lucide**: 完成見本と同じバージョンを読み込む（例: `lucide@0.469.0`）。目次見出しアイコンは `w-4 h-4`、`.toc-sub` 内は `w-3.5 h-3.5` など、完成見本のクラスに揃える。
 
 ---
 
 図解は**パニっくんとウパ博士の会話のラリー**を主コンテンツとする。台本にない「用語解説コーナー」「まず覚える3つ」「ナレーションだけの説明ブロック」は置かない。たとえ話・定義・コードの意味づけは**ウパ博士の吹き出し**（台本の流れに沿って）に含める。
 
-**レイアウトの本質**: 読者が会話を追いやすいよう、**パニっくんは画面左・ウパ博士は画面右**のメッセンジャー風に固定する（見た目の左右が話者と一致する）。あわせて**ヘッダー直後にインライン目次**を置き、長い台本でも「どこに何があるか」を先に示す。
+**レイアウトの本質**: 読者が会話を追いやすいよう、**パニっくんは画面左・ウパ博士は画面右**のメッセンジャー風に固定する（見た目の左右が話者と一致する）。あわせて **`main` 内の先頭**にインライン目次（`.toc-inline`）を置き、読み順ではヘッダーの直後に相当する位置で、長い台本でも「どこに何があるか」を先に示す（`</header>` と `<main>` の間には置かない。完成見本どおり）。
 
-**吹き出しの見た目**: パニっくん・ウパ博士とも**吹き出しに色面（黄・青など）を付けない**。白背景と細い中立ボーダーは共通。**強調は本文中の span** で行う——結論・いちばん伝えたい点は**赤＋太字**（`.bubble-key`）、ボタン名やメニューなどUI上の呼び名は**黒＋太字**（`.bubble-ui`）。詳細は [html-structure.md](html-structure.md) の「吹き出し内の強調」を参照。
+**吹き出しの見た目**: パニっくん・ウパ博士とも**吹き出しに色面（黄・青など）を付けない**。白背景と細い中立ボーダーは共通。**強調は本文中の span** で行う——結論・いちばん伝えたい点は**赤＋太字**（`.bubble-key`）、ボタン名やメニューなどUI上の呼び名は**黒＋太字**（`.bubble-ui`）。詳細は [html-structure.md](html-structure.md) の「吹き出し内の強調」を参照（数値・クラス名は完成見本が優先）。
 
 ## 成功する図解の構造
 
 ```
-1. ヘッダー（グラデーション背景）
-   └─ タイトル + サブタイトル（図解の主題。台本・依頼に合わせる）
+1. ヘッダー（グラデーション背景・layout-column 内）
+   └─ タイトル（コンパクト。サブタイトルは台本・依頼に応じて任意）
 
-2. 冒頭目次（.toc-inline・main 内の先頭）
+2. 冒頭目次（.toc-inline・main 内の先頭・layout-column 内）
    └─ 台本の見出し・話の区切りに対応したアンカー一覧
-   └─ サブ項目は .toc-sub でインデント（HTML では Lucide「sparkles」など。絵文字は使わない）
+   └─ サブ項目は .toc-sub でインデント（Lucide「sparkles」など。絵文字は使わない）
+   └─ 台本に章立てがほぼない短い図解では、**「導入／本題／まとめ」など最小3項目**にとどめてよい（SKILL ワークフローと同じ）
 
 3. メイン本文
-   └─ 台本順に、パニっくん（左アバター）／ウパ博士（右アバター）の吹き出しを連ねる
+   └─ （任意）章見出し .body-chapter-heading + id
+   └─ .section-card 内に、台本順でパニっくん（左）／ウパ博士（右）の吹き出しを連ねる
    └─ 必要ならその直下にだけ、コード・図・箇条書き（直前のセリフで文脈がつながること）
 
-4. （任意）フローティング目次（.toc）
-   └─ デスクトップのみ。セクション数が非常に多い長編だけ、冒頭目次に加えて併用してよい
+4. （参考・任意）フローティング目次（`.toc` など）
+   └─ **現行の完成見本 HTML には含まれていない**。デフォルトは手順 2 の `.toc-inline` のみとする。セクション数が極端に多い長編で、チーム内に別途合意したマークアップがある場合のみ、デスクトップ向けに併用を検討してよい（新規に足すときは完成見本の CSS・トーンと矛盾しないよう、[html-structure.md](html-structure.md) や既存図解の近いパーツに合わせる）
 ```
 
 **やらないこと**
@@ -36,17 +55,18 @@
 - 「まず覚える3つ」など、台本にない優先度リストを新設する
 - セクション見出し＋教科書調の本文だけのブロックを、対話の代わりに量産する
 - パニっくんとウパ博士の**アバター左右を入れ替える**（メッセンジャー風の一貫性を崩さない）
+- **旧完成見本**（`output/ai-tool-roadmap-apr2026/` など）の太い max-width・大きい見出し・異なるブランド色に**勝手に戻す**
 
 ---
 
 ## 冒頭目次（インライン）
 
-台本側に章立て・ランキング・「このあとプロンプト」などの**階層があるときは、HTML の目次にも同じ階層**を反映する。リンク先は対話ブロックや `section` の `id` と一対一で対応させる。
+台本側に章立て・ランキング・「このあとプロンプト」などの**階層があるときは、HTML の目次にも同じ階層**を反映する。リンク先は対話ブロックや `section` の `id` と一対一で対応させる。**アイコンサイズ・フォントサイズは完成見本の `.toc-inline` に合わせる。**
 
 ```html
 <aside class="toc-inline" aria-label="この記事の目次">
   <h2>
-    <i data-lucide="list" class="w-6 h-6 text-[var(--brand-secondary)]"></i>
+    <i data-lucide="list" class="w-4 h-4 text-[var(--brand-secondary)]" aria-hidden="true"></i>
     目次
   </h2>
   <nav>
@@ -56,7 +76,7 @@
         <a href="#sec-rank-3">第3位：〇〇</a>
         <ul class="toc-sub">
           <li>
-            <i data-lucide="sparkles" class="w-4 h-4 toc-sub-icon" aria-hidden="true"></i>
+            <i data-lucide="sparkles" class="w-3.5 h-3.5 toc-sub-icon" aria-hidden="true"></i>
             <a href="#sec-rank-3-prompt">〇〇用プロンプト例</a>
           </li>
         </ul>
@@ -71,34 +91,42 @@
 
 ## 対話の連なり（基本形）
 
+**アバター＋名前＋`.bubble-body` は完成見本と同一パターンにする。**
+
 ```html
 <section class="section-card" id="sec-hook">
   <!-- パニっくん：左アバター -->
-  <div class="flex items-start gap-4 mb-6">
-    <img src="./images/パニっくん-疑っている-512×512-透過.png"
-         alt="パニっくん" class="w-20 h-20 object-contain flex-shrink-0">
+  <div class="flex items-start gap-4 mb-8">
+    <div class="char-stack char-stack--panik">
+      <img src="./images/パニっくん-疑っている-512×512-透過.png" alt="パニっくん" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+      <p class="char-name">パニっくん</p>
+    </div>
     <div class="char-bubble char-bubble--from-left flex-1">
-      <p class="text-lg text-gray-800">「フック」って何ですか？プログラムに釣り針でも刺すんですか？</p>
+      <p class="bubble-body">「フック」って何ですか？プログラムに釣り針でも刺すんですか？</p>
     </div>
   </div>
 
   <!-- ウパ博士：右アバター（flex-row-reverse） -->
-  <div class="flex flex-row-reverse items-start gap-4 mb-6">
-    <img src="./images/ウパ博士-諭す-512×512-透過.png"
-         alt="ウパ博士" class="w-20 h-20 object-contain flex-shrink-0">
+  <div class="flex flex-row-reverse items-start gap-4 mb-8">
+    <div class="char-stack char-stack--upa">
+      <img src="./images/ウパ博士-諭す-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+      <p class="char-name">ウパ博士</p>
+    </div>
     <div class="char-bubble char-bubble--from-right flex-1">
-      <p class="text-lg text-gray-800">
+      <p class="bubble-body">
         良い質問ですね、パニさん。フックとは<span class="bubble-ui">「割り込みポイント」</span>のことです。
         会社のセキュリティゲートを想像してください。通る前に止めて確認する——<span class="bubble-key">あれと同じ役割</span>を、プログラムの中で果たします。
       </p>
     </div>
   </div>
 
-  <div class="flex items-start gap-4 mb-6">
-    <img src="./images/パニっくん-驚き-512×512-透過.png"
-         alt="パニっくん" class="w-20 h-20 object-contain flex-shrink-0">
+  <div class="flex items-start gap-4 mb-8">
+    <div class="char-stack char-stack--panik">
+      <img src="./images/パニっくん-驚き-512×512-透過.png" alt="パニっくん" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+      <p class="char-name">パニっくん</p>
+    </div>
     <div class="char-bubble char-bubble--from-left flex-1">
-      <p class="text-lg text-gray-800">マジ？　つまり、動く前に「ちょっと待って！」って止められるんですね！</p>
+      <p class="bubble-body">マジ？　つまり、動く前に「ちょっと待って！」って止められるんですね！</p>
     </div>
   </div>
 </section>
@@ -113,11 +141,13 @@
 説明は**別カードの「このコードがやること」見出し**ではなく、**ウパ博士のセリフ**にまとめ、その直後にコードを置く。
 
 ```html
-<div class="flex flex-row-reverse items-start gap-4 mb-4">
-  <img src="./images/ウパ博士-標準-512×512-透過.png"
-       alt="ウパ博士" class="w-20 h-20 object-contain flex-shrink-0">
+<div class="flex flex-row-reverse items-start gap-4 mb-8">
+  <div class="char-stack char-stack--upa">
+    <img src="./images/ウパ博士-標準-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+    <p class="char-name">ウパ博士</p>
+  </div>
   <div class="char-bubble char-bubble--from-right flex-1">
-    <p class="text-lg text-gray-800">
+    <p class="bubble-body">
       たとえばこう書きます。<span class="bubble-ui">Write</span>ツール——ファイルを書き込む道具——が使われそうになったら、
       <span class="bubble-key">許可しない</span>と返すルールです。
     </p>
@@ -132,6 +162,8 @@
 </div>
 ```
 
+（`.code-block` の見た目が完成見本の `.script-prompt-block` 等と異なる場合は、**台本にコード／プロンプトのどちらが近いか**で完成見本側の近いパーツを選ぶ。上記の `mb-8` は対話行の行間の例であり、完成見本の当該箇所と異なる場合は**完成見本を優先**する。）
+
 ---
 
 ## たとえ話を入れる場合
@@ -139,11 +171,13 @@
 **「たとえ話：〇〇」という教材用の枠**を台本にないのに新設しない。台本にたとえがあるなら、**ウパ博士（または台本の話者）の吹き出し**の中で展開する。
 
 ```html
-<div class="flex flex-row-reverse items-start gap-4 mb-6">
-  <img src="./images/ウパ博士-諭す-512×512-透過.png"
-       alt="ウパ博士" class="w-20 h-20 object-contain flex-shrink-0">
+<div class="flex flex-row-reverse items-start gap-4 mb-8">
+  <div class="char-stack char-stack--upa">
+    <img src="./images/ウパ博士-諭す-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+    <p class="char-name">ウパ博士</p>
+  </div>
   <div class="char-bubble char-bubble--from-right flex-1">
-    <p class="text-lg text-gray-800">
+    <p class="bubble-body">
       スマホで「カメラへのアクセスを許可しますか？」と出るあれを思い出してください。
       許可する・しないの前に立ち止まる——<span class="bubble-key">それがまさにこの仕組みに近い</span>です。
     </p>
@@ -153,18 +187,10 @@
 
 ---
 
+<a id="quality-checklist"></a>
+
 ## 品質チェックリスト
 
-作成後、以下を確認する。
+**正本は [SKILL.md](../SKILL.md) の「品質チェックリスト」**に移した。図解完成後はそちらを**すべて**確認する。
 
-- [ ] 本文の言葉は**台本の対話中心**で、用語辞典パネルや「まず覚える3つ」を勝手に挟んでいない
-- [ ] 用語の初出説明は**ウパ博士（等）のセリフ**に含めている
-- [ ] コードや図の直前が**対話で**つながっている
-- [ ] **ヘッダー直後にインライン目次**（`.toc-inline`）があり、`id`／`href` が対応している
-- [ ] **パニっくんは左アバター**（`char-bubble char-bubble--from-left`）、**ウパ博士は右アバター**（`flex-row-reverse` + `char-bubble char-bubble--from-right`）
-- [ ] 吹き出しに話者別の色面を付けず、要点は赤太字・UI指し示しは黒太字で足りている
-- [ ] Lucide iconのみ使用（絵文字なし）
-- [ ] ヘッダー・ナビなどにブランドカラーが適用されている（吹き出し本体の色分けはしない）
-- [ ] キャラクター画像のパスが正しい
-- [ ] スマホで読みやすい（レスポンシブ）
-- [ ] 長編では任意で `.toc`（フローティング）を併用している（なくてもよい）
+**制作時の心がけ（要約・SKILL にない代替チェックリストではない）**: 完成見本を複製したまま CSS 順序（Tailwind CDN と `</body>` 直前の吹き出し用スタイルの順）を保つこと。見た目は `output/ai-daily-report-slack-apr2026/index.html` と同系統であること。旧完成見本（`ai-tool-roadmap-apr2026`）のレイアウトに戻さないこと。

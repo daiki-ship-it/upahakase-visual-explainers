@@ -21,7 +21,7 @@
 - **結論・核心・いちばん覚えてほしい一点** → `.bubble-key`（赤＋太字）。例: セリフの一部を `<span class="bubble-key">許可が下りるまで動かない</span>` のようにマークする。
 - **画面上の名前**（ボタン・メニュー・モード名など） → `.bubble-ui`（黒＋太字）。例: `<span class="bubble-ui">設定</span>を開いてください`。
 
-クラス定義は [html-structure.md](html-structure.md) の `<style>` にある。台本段階では「（赤太字）」「（UI名・黒太字）」などのメモでもよいが、HTMLでは上記に落とす。
+`.bubble-key` / `.bubble-ui` の見た目は **完成見本** `output/ai-daily-report-slack-apr2026/index.html` の `<style>` にある（説明は [html-structure.md](html-structure.md)）。台本段階では「（赤太字）」「（UI名・黒太字）」などのメモでもよいが、HTML では上記に落とす。
 
 ---
 
@@ -85,4 +85,4 @@
 
 ## （参考）スタイル用CSS — 用語ボックス
 
-台本忠実モードでは**基本的に使わない**。過去HTMLとの互換や例外で使う場合のみ。[html-structure.md](html-structure.md) の `.term-explain` 定義を参照。
+diagram-upa では**独立した用語ボックスを置かない**（[html-structure.md](html-structure.md) にも `.term-explain` の定義は載せない）。過去に作った HTML との互換でだけ必要な場合は、当該ファイル内にスタイルを自己完結させる。
