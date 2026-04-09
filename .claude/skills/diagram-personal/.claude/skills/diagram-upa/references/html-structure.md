@@ -10,7 +10,8 @@
 
 1. **`output/ai-daily-report-slack-apr2026/index.html` を丸ごと複製**して編集の起点にする。
 2. 次だけ台本に合わせて差し替える: `<title>`、`<header>` の見出し、`.toc-inline` のリンク列、`main` 内の `h2.body-chapter-heading` および各 `section.section-card` の対話・図・手順ブロック。
-3. **原則として触らない**: Tailwind／Lucide の `<script>`（**`@latest` に変更しない**。完成見本と同じピン留め URL を維持）、Google Fonts の `<link>`、`<head>` 内の `<style>` 全体、`body` のクラス、**`</body>` 直前の `<style>`（`.slack-daily-page` スコープの吹き出し）** と続く `lucide.createIcons()` のスクリプト。順序を入れ替えると Tailwind が吹き出し用 CSS を上書きし、見た目が崩れる。
+3. **利用条件・著作権フッター**（`</main>` の直後の `<footer aria-label="利用条件・著作権">…</footer>`）: 条文・マークアップの正本は **[legal-footer-snippet.html](legal-footer-snippet.html)**。完成見本複製時はフッターごと残し、**当該資料の公式URL** と **最終更新日** だけ置換する。条文の要約・削除・言い換えはしない。複製しない経路では snippet を貼り付け、`__UPA_LEGAL_OFFICIAL_URL__` / `__UPA_LEGAL_LAST_UPDATED__` をすべて埋める。運用・漫画派生版は [legal-footer.md](legal-footer.md)。SKILL の [必須フッター節](../SKILL.md#legal-footer-required) も参照。
+4. **原則として触らない**: Tailwind／Lucide の `<script>`（**`@latest` に変更しない**。完成見本と同じピン留め URL を維持）、Google Fonts の `<link>`、`<head>` 内の `<style>` 全体、`body` のクラス、**`</body>` 直前の `<style>`（`.slack-daily-page` スコープの吹き出し）** と続く `lucide.createIcons()` のスクリプト。順序を入れ替えると Tailwind が吹き出し用 CSS を上書きし、見た目が崩れる。
 
 ### diagram-upa で使わないパーツ
 

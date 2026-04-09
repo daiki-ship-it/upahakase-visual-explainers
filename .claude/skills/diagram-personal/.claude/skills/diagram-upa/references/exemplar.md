@@ -5,12 +5,13 @@
 [SKILL.md](../SKILL.md) の「依存」と同じ解決順を、ここでも短く示す。
 
 1. **唯一のビジュアル正本**: リポジトリの **`output/ai-daily-report-slack-apr2026/index.html`**（必ず複製してから編集する）。
-2. **品質チェックの正本**: [SKILL.md](../SKILL.md) の「品質チェックリスト」。チェック項目の列挙は SKILL のみ（このファイル末尾はリンク＋要約のみ）。
-3. **説明・断片**: **この exemplar.md** と [html-structure.md](html-structure.md)。構成の型・HTML 断片・Lucide の書き方など。**1 または 2 と食い違う具体的な記述**（クラス・余白・数値・検証の解釈）は、**完成見本および SKILL を優先**する。
+2. **利用条件・著作権フッター（条文・`<footer>` マークアップ）の正本**: [legal-footer-snippet.html](legal-footer-snippet.html)。完成見本のフッターはこれにプレースホルダを埋めたものと一致させる。運用は [legal-footer.md](legal-footer.md)。**条文の要約・削除・言い換えはしない**（[SKILL.md](../SKILL.md#legal-footer-required) の必須フッター節）。
+3. **品質チェックの正本**: [SKILL.md](../SKILL.md) の「品質チェックリスト」。チェック項目の列挙は SKILL のみ（このファイル末尾はリンク＋要約のみ）。
+4. **説明・断片**: **この exemplar.md** と [html-structure.md](html-structure.md)。構成の型・HTML 断片・Lucide の書き方など。**1〜3 と食い違う具体的な記述**（クラス・余白・数値・検証の解釈）は、**完成見本・snippet および SKILL を優先**する。
 
 ## 完成見本（1ファイル全体・ビジュアルのSSOT）
 
-リポジトリルートから **`output/ai-daily-report-slack-apr2026/index.html`** を開く。**テキストの大きさ、配置、色、余白、フォント、ヘッダー、目次、セクションカード、対話行（`.char-stack`／`.bubble-body`）、章見出し、Lucide のサイズ感・読み込み URL、ページ背景、`</body>` 直前の吹き出し用 CSS**など、**これから作る図解の見た目はすべてこのファイルに合わせる**（新規はこの HTML を複製して中身だけ差し替えるのが最短。断片の説明はこのファイルの下に続く）。
+リポジトリルートから **`output/ai-daily-report-slack-apr2026/index.html`** を開く。**テキストの大きさ、配置、色、余白、フォント、ヘッダー、目次、セクションカード、対話行（`.char-stack`／`.bubble-body`）、章見出し、Lucide のサイズ感・読み込み URL、ページ背景、`</main>` 直後の利用条件・著作権フッター、`</body>` 直前の吹き出し用 CSS**など、**これから作る図解の見た目はすべてこのファイルに合わせる**（新規はこの HTML を複製して中身だけ差し替えるのが最短。断片の説明はこのファイルの下に続く）。フッターの条文・構造の**編集正本**は [legal-footer-snippet.html](legal-footer-snippet.html)（完成見本は展開済みの参照実装）。
 
 **レイアウトの要点（完成見本に実装済み）**
 
@@ -45,7 +46,10 @@
    └─ .section-card 内に、台本順でパニっくん（左）／ウパ博士（右）の吹き出しを連ねる
    └─ 必要ならその直下にだけ、コード・図・箇条書き（直前のセリフで文脈がつながること）
 
-4. （参考・任意）フローティング目次（`.toc` など）
+4. 利用条件・著作権（必須）
+   └─ `</main>` の直後に `<footer role="contentinfo" aria-label="利用条件・著作権">…</footer>` を置く（条文・マークアップは [legal-footer-snippet.html](legal-footer-snippet.html) をそのまま。URL・最終更新日のみ資料ごとに置換）。**削除・要約・独自改変は禁止**。漫画風派生版のみ [legal-footer.md](legal-footer.md) のオプション1段落を追加可。
+
+5. （参考・任意）フローティング目次（`.toc` など）
    └─ **現行の完成見本 HTML には含まれていない**。デフォルトは手順 2 の `.toc-inline` のみとする。セクション数が極端に多い長編で、チーム内に別途合意したマークアップがある場合のみ、デスクトップ向けに併用を検討してよい（新規に足すときは完成見本の CSS・トーンと矛盾しないよう、[html-structure.md](html-structure.md) や既存図解の近いパーツに合わせる）
 ```
 
@@ -56,6 +60,7 @@
 - セクション見出し＋教科書調の本文だけのブロックを、対話の代わりに量産する
 - パニっくんとウパ博士の**アバター左右を入れ替える**（メッセンジャー風の一貫性を崩さない）
 - **旧完成見本**（`output/ai-tool-roadmap-apr2026/` など）の太い max-width・大きい見出し・異なるブランド色に**勝手に戻す**
+- **利用条件・著作権**の `<footer>` を削除する、条文を要約・言い換えする、正本（[legal-footer-snippet.html](legal-footer-snippet.html)）にない文を足す（漫画派生の [legal-footer.md](legal-footer.md) 所定の1段落を除く）
 
 ---
 
@@ -193,4 +198,4 @@
 
 **正本は [SKILL.md](../SKILL.md) の「品質チェックリスト」**に移した。図解完成後はそちらを**すべて**確認する。
 
-**制作時の心がけ（要約・SKILL にない代替チェックリストではない）**: 完成見本を複製したまま CSS 順序（Tailwind CDN と `</body>` 直前の吹き出し用スタイルの順）を保つこと。見た目は `output/ai-daily-report-slack-apr2026/index.html` と同系統であること。旧完成見本（`ai-tool-roadmap-apr2026`）のレイアウトに戻さないこと。
+**制作時の心がけ（要約・SKILL にない代替チェックリストではない）**: 完成見本を複製したまま CSS 順序（Tailwind CDN と `</body>` 直前の吹き出し用スタイルの順）を保つこと。見た目は `output/ai-daily-report-slack-apr2026/index.html` と同系統であること。旧完成見本（`ai-tool-roadmap-apr2026`）のレイアウトに戻さないこと。**`</main>` 直後の利用条件・著作権フッター**は [legal-footer-snippet.html](legal-footer-snippet.html) と一致させ、プレースホルダを残さないこと。

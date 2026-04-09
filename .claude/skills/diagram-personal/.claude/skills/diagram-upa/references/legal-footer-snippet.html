@@ -1,0 +1,51 @@
+<!--
+  diagram-upa — 利用条件・著作権フッターの唯一の正本（SSoT）
+
+  成果物の index.html に取り込む前に、次のプレースホルダをすべて置換すること（残置禁止）:
+    __UPA_LEGAL_OFFICIAL_URL__  … 当該資料の公式配布ページの絶対URL（例: https://example.surge.sh/ または .../index-manga.html）。
+                                 本文中の「この資料の公式配布ページ」リンクは 2 箇所あり、同一URLを使う。
+    __UPA_LEGAL_LAST_UPDATED__  … 日付の表示部分のみ（例: 2026年4月9日）。行頭の「最終更新：」はテンプレに含まれる。
+
+  ルール:
+    - このブロックの日本語条文・HTML構造を、SKILLやチャット上で要約・言い換え・略してはいけない（正本からのコピーのみ）。
+    - 更新手順: 本ファイルを修正 → プレースホルダ展開後のHTMLで output/ の完成見本などリポジトリ内の該当ファイルを揃える。
+
+  挿入位置: </main> の直後、</body> 直前のページスコープ CSS より前。
+  漫画風派生版で追加する1段落は references/legal-footer.md を参照。
+-->
+  <!-- 利用条件・著作権（条文・構造の正本: diagram-upa/references/legal-footer-snippet.html） -->
+  <footer class="layout-column px-4 pb-10 md:pb-12" role="contentinfo" aria-label="利用条件・著作権">
+    <div class="section-card text-xs md:text-sm text-slate-600 leading-relaxed space-y-3">
+      <h2 class="text-sm font-bold text-slate-800 m-0">利用条件・著作権</h2>
+      <p class="m-0 text-[0.8125rem] text-slate-500">最終更新：__UPA_LEGAL_LAST_UPDATED__</p>
+      <p class="m-0">本資料（文章・構成・レイアウト・デザイン・画像・HTML/CSS/JavaScript を含みます。以下「本資料」）は、著作者・著作権者である個人事業主<strong class="text-slate-800">佐藤大生</strong>（発信名「ウパ博士」）の著作物です。<strong class="text-slate-800">本条件で明示的に許諾されない複製・改変・再配布は、原則として禁じます。</strong></p>
+      <p class="m-0"><strong class="text-slate-800">法令との関係：</strong>著作権法その他の法令により認められる私的利用・適法な引用その他の利用は、法令の定めるところにより妨げられません。引用や要約の紹介を行う場合は、<strong class="text-slate-800">著作者名・発信名の表示</strong>および<strong class="text-slate-800"><a href="__UPA_LEGAL_OFFICIAL_URL__" class="text-[var(--brand-secondary)] underline font-semibold hover:opacity-90">この資料の公式配布ページ</a>へのリンク</strong>を、同一の画面・投稿内で可能な範囲で併記してください。可否が判断しづらい場合は、事前に配布元へお問い合わせください。</p>
+      <p class="m-0"><strong class="text-slate-800">同意：</strong>本資料を閲覧・保存し、または複製・共有その他の利用を開始した時点で、当該時点で掲示されている本条件に同意したものとみなします。</p>
+      <p class="m-0 font-semibold text-slate-700">許諾される利用（いずれも無償・個別の書面許諾は不要）</p>
+      <ul class="m-0 pl-5 list-disc space-y-1.5">
+        <li>個人の学習目的での閲覧・印刷（私的利用の範囲内）</li>
+        <li><strong class="text-slate-800">同一の法人または同一の団体</strong>（学校・NPO 等）の構成員が、当該法人・団体の<strong class="text-slate-800">内部の業務・学習</strong>のために行う共有（<strong class="text-slate-800">ファイル内容を改変しないこと</strong>、および著作者の表示・本注意書きを残すことを条件とします）。<strong class="text-slate-800">別人格の法人</strong>（関連会社・グループ会社等）へのファイルのそのままの転送は、本条の「同一団体内の共有」には含まれません。必要な場合は、相手先の担当者へ<strong class="text-slate-800">公式配布ページ</strong>を案内してください。</li>
+        <li><strong class="text-slate-800">改変</strong>とは、文章・図表・デザイン・コードの<strong class="text-slate-800">内容を変更・削除・加工すること</strong>を指します。ファイル形式の変換や圧縮で<strong class="text-slate-800">表現内容が実質同一</strong>に保たれる場合は改変に含めません。変換後のファイルを第三者へ渡す行為は、別途「再配布」に関する条件に従います。</li>
+        <li>SNS・ブログ・メルマガ等で紹介する場合：<strong class="text-slate-800"><a href="__UPA_LEGAL_OFFICIAL_URL__" class="text-[var(--brand-secondary)] underline font-semibold hover:opacity-90">この資料の公式配布ページ</a>へのリンク</strong>を、第三者が著作者・出典を誤認しないよう<strong class="text-slate-800">明確に表示すること</strong>を条件に、紹介・シェアを認めます。掲載プラットフォームの仕様でリンクが不可のときは、プロフィール・固定投稿等に置ける<strong class="text-slate-800">公式URLの明示</strong>と<strong class="text-slate-800">著作者名・発信名・資料名</strong>の表示で代替できます（可能な限り同一画面内にリンクを掲載してください）。</li>
+        <li>画面キャプチャや動画の一部などで本資料の見た目を示す場合も、上記と同様に<strong class="text-slate-800">出典が分かる表示</strong>および<strong class="text-slate-800">公式配布ページへの導線</strong>（リンクまたは上記代替）を併記してください。</li>
+      </ul>
+      <p class="m-0 font-semibold text-slate-700">禁止事項（違反が判明した場合、法令に基づき差止め・損害賠償の請求その他必要な対応を行うことがあります）</p>
+      <ul class="m-0 pl-5 list-disc space-y-1.5">
+        <li><strong class="text-slate-800">本資料の内容を変更する改変、翻案、第三者への抜粋・要約文の再配布（適法な引用の範囲を超えるもの）、他コンテンツとの不当な合成</strong>（表現の軽微な修正、意図的なデザイン・レイアウトの変更、ロゴ・キャラクター画像の切り出し等を含みます）</li>
+        <li><strong class="text-slate-800">本資料（または実質同一の複製・改変物）を対価（金銭・ポイント等）と交換に提供すること、商用ライセンスの付与、有料講座・教材・テンプレート等の「主たる教材コンテンツ」としての組み込み。</strong>ただし、<strong class="text-slate-800">本資料のファイルを販売・頒布の対象としない</strong>無償の勉強会・社内説明・紹介投稿などで、講師謝礼や会場費のみが発生する程度の場合は、この限りではありません（参加者へファイルを一括配布する場合は、上記「同一団体内の共有」または公式ページ案内に従ってください）。</li>
+        <li>著作者名・本注意書き・出典情報の削除、または第三者の著作物・サービスであると誤認させる表示</li>
+        <li>公式配布ページへのリンク（または上記に定める代替表示）を果たさないままの紹介・転載・ファイルの再配布</li>
+        <li>本注意書きに同意できない形での利用</li>
+      </ul>
+      <p class="m-0 font-semibold text-slate-700">お問い合わせ</p>
+      <p class="m-0">商用利用・二次利用の可否、引用の事前確認などは、<strong class="text-slate-800">配布元で案内している連絡先</strong>（メール・フォーム等）までお願いします。連絡先が掲示されていない場合は、発信チャンネル（SNS 等）のダイレクトメッセージ等でご連絡ください。</p>
+      <p class="m-0 font-semibold text-slate-700">第三者の素材・商標</p>
+      <p class="m-0">本資料が参照する Web フォント、スクリプト（CDN 経由を含む）、アイコン等は、各権利者の利用条件に従います。</p>
+      <p class="m-0">本資料に掲載する各社のソフトウェア・サービスの画面キャプチャ、ロゴ、および記載の製品名・サービス名は、それぞれ各権利者に帰属します。掲載は説明・紹介を目的とするものであり、当該権利者の公式見解や推認を意味するものではありません。各社の商標表示ガイドライン、利用規約等に従ってください。</p>
+      <p class="m-0 font-semibold text-slate-700">免責</p>
+      <p class="m-0">本資料の内容は、作成時点の情報に基づくものであり、正確性・完全性・最新性を保証するものではありません。利用により生じたいかなる損害についても、法令上認められる範囲を除き著作者・著作権者は責任を負いません。</p>
+      <p class="m-0 font-semibold text-slate-700">準拠法</p>
+      <p class="m-0">本条件の準拠法は<strong class="text-slate-800">日本法</strong>とします。訴訟の必要が生じた場合、著作者・著作権者の住所地を管轄する地方裁判所を第一審の合意管轄裁判所とします。</p>
+      <p class="m-0 pt-3 mt-1 border-t border-slate-200/90 text-slate-500 text-[0.8125rem] leading-relaxed">本条件にご同意いただけない場合は、本資料の利用（閲覧・保存・複製・共有等）を開始しないでください。本条件は<strong class="text-slate-700">変更後の版が本ページに掲示された日以降に開始する利用</strong>に適用されます。それ以前に入手したファイルについては、入手時点の条件に従い、本条で許諾された範囲の私的利用・共有を継続できます。</p>
+    </div>
+  </footer>
