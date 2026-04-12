@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AIが毎朝タスク進捗を自動報告する仕組み — ai-launch-dashboard - ウパ博士｜AI業務設計の専門家</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --brand-primary: hsl(188, 65%, 38%);
+      --brand-secondary: hsl(198, 58%, 34%);
+      --brand-gradient: linear-gradient(90deg, hsl(201, 72%, 34%), hsl(186, 68%, 42%));
+      --surface-bg: hsl(192, 45%, 99.4%);
+    }
+    body {
+      font-family: 'Noto Sans JP', 'Inter', sans-serif;
+      font-size: 15px;
+      line-height: 1.65;
+      -webkit-text-size-adjust: 100%;
+    }
+    .layout-column {
+      width: 100%;
+      max-width: 26rem; /* ~416px: スマホ縦読み相当の中央カラム */
+      margin-left: auto;
+      margin-right: auto;
+    }
+    @media (min-width: 480px) {
+      .layout-column { max-width: 28rem; } /* ~448px */
+    }
+    .header-gradient { background: var(--brand-gradient); }
+    .section-card {
+      background: var(--surface-bg);
+      border-radius: 0.75rem;
+      box-shadow: 0 1px 3px rgba(12, 60, 75, 0.09);
+      padding: 1.45rem 1.35rem;
+      margin-bottom: 1.35rem;
+    }
+    /* 吹き出しの見た目は </body> 直前のブロック（Tailwind CDN より後に読み込ませる） */
+    .bubble-key { font-weight: 700; color: #dc2626; }
+    .bubble-ui { font-weight: 700; color: #111827; }
+    .toc-inline {
+      background: var(--surface-bg);
+      border-radius: 0.75rem;
+      box-shadow: 0 1px 3px rgba(12, 60, 75, 0.09);
+      padding: 1.45rem 1.35rem;
+      margin-bottom: 1.35rem;
+    }
+    .toc-inline h2 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #1f2937;
+      margin-bottom: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .toc-inline nav > ol { list-style: none; padding: 0; margin: 0; counter-reset: toc; }
+    .toc-inline nav > ol > li { counter-increment: toc; margin-bottom: 0.7rem; line-height: 1.55; font-size: 0.9375rem; }
+    .toc-inline nav > ol > li > a {
+      color: #374151;
+      font-weight: 500;
+      text-decoration: none;
+      display: block;
+      padding: 0.4rem 0.2rem;
+      margin: -0.15rem 0;
+      border-radius: 0.25rem;
+    }
+    .toc-inline nav > ol > li > a:hover { color: var(--brand-secondary); text-decoration: underline; }
+    .toc-inline nav > ol > li > a:focus-visible,
+    .toc-inline .toc-sub a:focus-visible {
+      outline: 2px solid hsl(192, 58%, 48%);
+      outline-offset: 2px;
+    }
+    .toc-inline .toc-sub {
+      list-style: none;
+      padding: 0.35rem 0 0 1.5rem;
+      margin: 0;
+    }
+    .toc-inline .toc-sub li {
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.35rem;
+      font-size: 0.8125rem;
+      color: hsl(198, 42%, 30%);
+    }
+    .toc-inline .toc-sub a {
+      color: inherit;
+      font-weight: 400;
+      text-decoration: none;
+      display: block;
+      padding: 0.35rem 0.15rem;
+      margin: -0.1rem 0;
+      border-radius: 0.25rem;
+    }
+    .toc-inline .toc-sub a:hover { text-decoration: underline; color: var(--brand-secondary); }
+    .toc-inline .toc-sub .toc-sub-icon {
+      flex-shrink: 0;
+      margin-top: 0.15rem;
+      color: hsl(188, 55%, 42%);
+    }
+    .script-list {
+      margin: 1rem 0 1.25rem;
+      padding: 1rem 1rem;
+      background: hsl(190, 38%, 97%);
+      border-radius: 0.5rem;
+      border: 1px solid hsl(192, 24%, 88%);
+      font-size: 0.875rem;
+      line-height: 1.65;
+    }
+    .script-list ul, .script-list ol { margin: 0; padding-left: 1.125rem; color: #374151; }
+    .script-list li { margin-bottom: 0.65rem; }
+    .script-list a {
+      color: hsl(198, 50%, 34%);
+      font-weight: 600;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+    .script-list a:hover { color: hsl(186, 58%, 36%); }
+    .script-list .script-step-block { margin-bottom: 1.1rem; }
+    .script-list .script-step-label {
+      font-weight: 700;
+      color: #111827;
+      line-height: 1.5;
+      margin-bottom: 0.45rem;
+    }
+    .script-list .script-step-body {
+      margin: 0;
+      color: #374151;
+      line-height: 1.65;
+    }
+    .bubble-body {
+      font-size: 0.9375rem;
+      line-height: 1.7;
+      color: #1f2937;
+    }
+    .bubble-body .bubble-step-ol {
+      margin: 0.55rem 0 0.6rem;
+      padding-left: 1.35rem;
+      list-style: decimal;
+    }
+    .bubble-body .bubble-step-ol > li {
+      margin-bottom: 0.4rem;
+      padding-left: 0.2rem;
+    }
+    .bubble-body .bubble-step-ol > li:last-child { margin-bottom: 0; }
+    .bubble-body > p { margin: 0; }
+    .bubble-body-note {
+      margin-top: 0.65rem;
+      font-size: 0.875rem;
+      color: #4b5563;
+      line-height: 1.65;
+    }
+    .body-chapter-heading {
+      font-size: 1.0625rem;
+      font-weight: 700;
+      line-height: 1.45;
+      color: hsl(198, 48%, 26%);
+      border-left: 4px solid #dc2626;
+      padding-left: 0.75rem;
+      margin: 1.85rem 0 1.05rem;
+      scroll-margin-top: 0.75rem;
+    }
+    main > h2.body-chapter-heading:first-of-type {
+      margin-top: 0.5rem;
+    }
+    .body-sub-heading {
+      font-size: 0.9375rem;
+      font-weight: 700;
+      color: #374151;
+      margin: 1.5rem 0 0.85rem;
+      padding-bottom: 0.35rem;
+      border-bottom: 1px solid hsl(192, 22%, 87%);
+      scroll-margin-top: 0.75rem;
+    }
+    .body-sub-heading:first-child { margin-top: 0; }
+    .script-list-title {
+      font-weight: 700;
+      color: #1f2937;
+      margin-bottom: 0.65rem;
+      display: flex;
+      align-items: center;
+      gap: 0.375rem;
+      font-size: 0.875rem;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 slack-daily-page">
+  <header class="header-gradient text-white py-4 md:py-5">
+    <div class="layout-column px-4">
+      <h1 class="text-base md:text-lg font-bold leading-snug">AIが毎朝タスク進捗を自動報告する仕組み<br>— ai-launch-dashboard</h1>
+    </div>
+  </header>
+
+  <main class="layout-column px-4 py-6 md:py-8 pb-10 md:pb-12">
+    <aside class="toc-inline" aria-label="この記事の目次">
+      <h2>
+        <i data-lucide="list" class="w-4 h-4 text-[var(--brand-secondary)]" aria-hidden="true"></i>
+        目次
+      </h2>
+      <nav>
+        <ol>
+          <li><a href="#sec-ch1">第1章：毎朝の「進捗確認グセ」</a></li>
+          <li>
+            <a href="#sec-ch2">第2章：5ステップのパイプライン全体像</a>
+          </li>
+          <li>
+            <a href="#sec-ch3">第3章：各ステップの中身</a>
+            <ul class="toc-sub">
+              <li>
+                <i data-lucide="sparkles" class="w-3.5 h-3.5 toc-sub-icon" aria-hidden="true"></i>
+                <a href="#sec-ch3-notion">① Notionからデータを取得</a>
+              </li>
+              <li>
+                <i data-lucide="sparkles" class="w-3.5 h-3.5 toc-sub-icon" aria-hidden="true"></i>
+                <a href="#sec-ch3-ai">② Gemini AIが提案を生成</a>
+              </li>
+              <li>
+                <i data-lucide="sparkles" class="w-3.5 h-3.5 toc-sub-icon" aria-hidden="true"></i>
+                <a href="#sec-ch3-html">③ HTMLダッシュボードを作成</a>
+              </li>
+              <li>
+                <i data-lucide="sparkles" class="w-3.5 h-3.5 toc-sub-icon" aria-hidden="true"></i>
+                <a href="#sec-ch3-screenshot">④ スクリーンショットを撮影</a>
+              </li>
+              <li>
+                <i data-lucide="sparkles" class="w-3.5 h-3.5 toc-sub-icon" aria-hidden="true"></i>
+                <a href="#sec-ch3-slack">⑤ Slackへ投稿</a>
+              </li>
+            </ul>
+          </li>
+          <li><a href="#sec-ch4">第4章：全部つなぐ「自動スケジューラー」</a></li>
+          <li><a href="#sec-ch5">第5章：まとめ — 全体の流れをもう一度</a></li>
+        </ol>
+      </nav>
+    </aside>
+
+    <!-- 第1章 -->
+    <h2 class="body-chapter-heading" id="sec-ch1">第1章：毎朝の「進捗確認グセ」</h2>
+    <section class="section-card">
+      <div class="flex items-start gap-4 mb-8">
+        <div class="char-stack char-stack--panik">
+          <img src="./images/パニっくん-ひどく慌てている-512×512-透過.png" alt="パニっくん" class="char-avatar" width="80" height="80" loading="eager" fetchpriority="high" decoding="async">
+          <p class="char-name">パニっくん</p>
+        </div>
+        <div class="char-bubble char-bubble--from-left flex-1">
+          <p class="bubble-body">博士！ボク、毎朝起きるたびに「あの案件どこまで進んでるっけ」って不安になって、Notionを開いて、タスクを1個1個確認して……それを自分でSlackにまとめて報告するのが習慣になっちゃってるんですよ。しんどい！</p>
+        </div>
+      </div>
+
+      <div class="flex flex-row-reverse items-start gap-4 mb-8">
+        <div class="char-stack char-stack--upa">
+          <img src="./images/ウパ博士-真顔-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+          <p class="char-name">ウパ博士</p>
+        </div>
+        <div class="char-bubble char-bubble--from-right flex-1">
+          <p class="bubble-body">パニさん、その作業……全部AIに任せられますよ。私が使っている<span class="bubble-key">ai-launch-dashboard</span>というしくみがあれば、毎朝決まった時間にNotionのタスクを自動で集めて、AIに分析させて、ダッシュボードに変換して、スクリーンショットを撮って、Slackに投稿するまでを、<span class="bubble-key">人間が何もしなくても全部やってくれます。</span></p>
+        </div>
+      </div>
+
+      <div class="flex items-start gap-4 mb-8">
+        <div class="char-stack char-stack--panik">
+          <img src="./images/パニっくん-驚き-512×512-透過.png" alt="パニっくん" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+          <p class="char-name">パニっくん</p>
+        </div>
+        <div class="char-bubble char-bubble--from-left flex-1">
+          <p class="bubble-body">えっ！？Notionを見て、まとめて、Slackに送るまで全部!? それって……ロボットが代わりに朝礼やってくれるってこと？</p>
+        </div>
+      </div>
+
+      <div class="flex flex-row-reverse items-start gap-4 mb-8">
+        <div class="char-stack char-stack--upa">
+          <img src="./images/ウパ博士-諭す-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+          <p class="char-name">ウパ博士</p>
+        </div>
+        <div class="char-bubble char-bubble--from-right flex-1">
+          <p class="bubble-body">まさに、そのイメージです。仕組みを順番に見ていきましょうか。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 第2章 -->
+    <h2 class="body-chapter-heading" id="sec-ch2">第2章：5ステップのパイプライン全体像</h2>
+    <section class="section-card">
+      <div class="flex flex-row-reverse items-start gap-4 mb-8">
+        <div class="char-stack char-stack--upa">
+          <img src="./images/ウパ博士-標準-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+          <p class="char-name">ウパ博士</p>
+        </div>
+        <div class="char-bubble char-bubble--from-right flex-1">
+          <p class="bubble-body">このしくみは、5つのスクリプト（プログラムの手順書）が順番に走ることで動いています。流れはこうです。</p>
+        </div>
+      </div>
+
+      <div class="script-list" aria-label="5ステップのパイプライン">
+        <div class="script-list-title">
+          <i data-lucide="list-ordered" class="w-4 h-4 text-[var(--brand-secondary)]"></i>
+          5ステップのパイプライン
+        </div>
+        <ol>
+          <li><span class="bubble-ui">① fetch-notion-data.js</span> — NotionのデータベースからタスクをAPI経由で取得し、JSONファイルに保存</li>
+          <li><span class="bubble-ui">② generate-ai-suggestions.js</span> — ①のJSONをGemini AIに渡して「優先度の高い提案3つ」を生成し、別のJSONファイルに保存</li>
+          <li><span class="bubble-ui">③ generate-dashboard.js</span> — ①②のJSONを読み込み、タスク一覧・AI提案・8週間カレンダーを含むHTMLダッシュボードを生成</li>
+          <li><span class="bubble-ui">④ take-screenshot.js</span> — Playwright（自動ブラウザ）でHTMLを開き、3枚のスクリーンショットを撮影</li>
+          <li><span class="bubble-ui">⑤ post-to-slack.js</span> — SlackのAPIを叩いて、「@channel」メンション＋3枚の画像を投稿</li>
+        </ol>
+      </div>
+
+      <div class="flex items-start gap-4 mb-8">
+        <div class="char-stack char-stack--panik">
+          <img src="./images/パニっくん-疑っている-512×512-透過.png" alt="パニっくん" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+          <p class="char-name">パニっくん</p>
+        </div>
+        <div class="char-bubble char-bubble--from-left flex-1">
+          <p class="bubble-body">……えっと、「JSON」とか「Playwright」とかちょっとわからないんですけど。これって全部繋がってるんですか？</p>
+        </div>
+      </div>
+
+      <div class="flex flex-row-reverse items-start gap-4 mb-8">
+        <div class="char-stack char-stack--upa">
+          <img src="./images/ウパ博士-諭す-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+          <p class="char-name">ウパ博士</p>
+        </div>
+        <div class="char-bubble char-bubble--from-right flex-1">
+          <p class="bubble-body">はい、全部繋がっています。<span class="bubble-key">①の出力が②の入力になり、②の出力が③の入力になる——まるでベルトコンベアのようにデータが流れていく</span>構造です。各ステップを順番に見ていきましょう。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 第3章 -->
+    <h2 class="body-chapter-heading" id="sec-ch3">第3章：各ステップの中身</h2>
+    <section class="section-card">
+      <h3 class="body-sub-heading" id="sec-ch3-notion">① Notionからデータを取得（fetch-notion-data.js）</h3>
+
+      <div class="flex flex-row-reverse items-start gap-4 mb-8">
+        <div class="char-stack char-stack--upa">
+          <img src="./images/ウパ博士-標準-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+          <p class="char-name">ウパ博士</p>
+        </div>
+        <div class="char-bubble char-bubble--from-right flex-1">
+          <p class="bubble-body">最初のステップは、<span class="bubble-ui">Notionのデータベース</span>にアクセスしてタスク情報を引き出してくることです。<br><br>Notionには「API」というお問い合わせ窓口があって、「このデータベースのタスクを全部ください」とリクエストすると、JSON形式——いわば<span class="bubble-key">プログラムが読めるメモ帳</span>——でタスク一覧を返してくれます。</p>
+        </div>
+      </div>
+
+      <div class="flex items-start gap-4 mb-8">
+        <div class="char-stack char-stack--panik">
+          <img src="./images/パニっくん-疑っている-512×512-透過.png" alt="パニっくん" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+          <p class="char-name">パニっくん</p>
+        </div>
+        <div class="char-bubble char-bubble--from-left flex-1">
+          <p class="bubble-body">Notionって、ウェブサイトから見るものじゃないんですか？プログラムからも読めるの？</p>
+        </div>
+      </div>
+
+      <div class="flex flex-row-reverse items-start gap-4 mb-8">
+        <div class="char-stack char-stack--upa">
+          <img src="./images/ウパ博士-諭す-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+          <p class="char-name">ウパ博士</p>
+        </div>
+        <div class="char-bubble char-bubble--from-right flex-1">
+          <p class="bubble-body">そうです。<span class="bubble-key">画面から人間が見るのと、APIを通じてプログラムが読むのは、どちらも同じNotionのデータを見ています。</span>違うのは「窓口」だけです。<br><br>このステップでは、タスクの名前・締め切り・進捗率・ステータス・メモを取得して、「サブタスク」は除外し、親タスクだけを整理して保存します。締め切りが一番近いタスクも自動で判定しますよ。</p>
+        </div>
+      </div>
+
+      <div class="flex items-start gap-4 mb-8">
+        <div class="char-stack char-stack--panik">
+          <img src="./images/パニっくん-調子に乗ってる-512×512-透過.png" alt="パニっくん" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+          <p class="char-name">パニっくん</p>
+        </div>
+        <div class="char-bubble char-bubble--from-left flex-1">
+          <p class="bubble-body">つまりNotionのタスク情報が「プログラムが読めるメモ帳」に変換されるわけですね。次のステップでそれを使うんですか？</p>
+        </div>
+      </div>
+
+      <div class="flex flex-row-reverse items-start gap-4 mb-8">
+        <div class="char-stack char-stack--upa">
+          <img src="./images/ウパ博士-標準-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+          <p class="char-name">ウパ博士</p>
+        </div>
+        <div class="char-bubble char-bubble--from-right flex-1">
+          <p class="bubble-body">正確です。</p>
+        </div>
+      </div>
+
+      <h3 class="body-sub-heading" id="sec-ch3-ai">② Gemini AIが提案を生成（generate-ai-suggestions.js）</h3>
+
+      <div class="flex flex-row-reverse items-start gap-4 mb-8">
+        <div class="char-stack char-stack--upa">
+          <img src="./images/ウパ博士-思考、分析-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+          <p class="char-name">ウパ博士</p>
+        </div>
+        <div class="char-bubble char-bubble--from-right flex-1">
+          <p class="bubble-body">次は、①で取得したタスク一覧をGoogleの<span class="bubble-ui">Gemini AI</span>（Googleが作っているAI）に渡して、「今のプロジェクト状況をPMの目線で分析して、優先度の高い順に3つの提案をください」と日本語で頼みます。<br><br>Geminiが返してくれた結果は「高・中・低」の優先度付き提案として、また別のJSONファイルに保存されます。</p>
+        </div>
+      </div>
+
+      <div class="flex items-start gap-4 mb-8">
+        <div class="char-stack char-stack--panik">
+          <img src="./images/パニっくん-驚き-512×512-透過.png" alt="パニっくん" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+          <p class="char-name">パニっくん</p>
+        </div>
+        <div class="char-bubble char-bubble--from-left flex-1">
+          <p class="bubble-body">えっ！タスクの一覧をAIに投げたら、「これを優先してください」って提案まで自動でやってくれるんですか？！</p>
+        </div>
+      </div>
+
+      <div class="flex flex-row-reverse items-start gap-4 mb-8">
+        <div class="char-stack char-stack--upa">
+          <img src="./images/ウパ博士-諭す-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+          <p class="char-name">ウパ博士</p>
+        </div>
+        <div class="char-bubble char-bubble--from-right flex-1">
+          <p class="bubble-body">はい。それと、万が一GeminiのAPIが落ちていても安心なように、<span class="bubble-key">「フォールバック」という保険</span>が組み込まれています。危険なタスクの数を数えて、機械的に汎用的な提案を自動生成する仕組みです。AIが使えないときでも、何かしらの提案は必ず出てきます。</p>
+        </div>
+      </div>
+
+      <h3 class="body-sub-heading" id="sec-ch3-html">③ HTMLダッシュボードを作成（generate-dashboard.js）</h3>
+
+      <div class="flex flex-row-reverse items-start gap-4 mb-8">
+        <div class="char-stack char-stack--upa">
+          <img src="./images/ウパ博士-標準-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+          <p class="char-name">ウパ博士</p>
+        </div>
+        <div class="char-bubble char-bubble--from-right flex-1">
+          <p class="bubble-body">①と②のJSONを両方読み込んで、ウェブページ（HTML）を1枚生成するのが③です。<br><br>このHTMLには5つのセクションが含まれています。</p>
+        </div>
+      </div>
+
+      <div class="script-list" aria-label="ダッシュボードのセクション">
+        <div class="script-list-title">
+          <i data-lucide="layout-dashboard" class="w-4 h-4 text-[var(--brand-secondary)]"></i>
+          ダッシュボードの構成
+        </div>
+        <ol>
+          <li><span class="bubble-ui">緊急アラートカード</span> — 締め切りが一番近いタスクを赤枠で強調表示</li>
+          <li><span class="bubble-ui">タスク一覧</span> — 「順調 / 注意 / 危険」のサマリーと、各タスクのプログレスバー・ステータス</li>
+          <li><span class="bubble-ui">AI提案カード</span> — Geminiが生成した3つの提案（優先度・要約・アクションリスト）</li>
+          <li><span class="bubble-ui">8週間カレンダー</span> — 今週の日曜日から8週分の日程と、その週に締め切りがあるタスクのバッジ</li>
+          <li><span class="bubble-ui">凡例</span> — ステータス絵文字の意味説明</li>
+        </ol>
+      </div>
+
+      <div class="flex items-start gap-4 mb-8">
+        <div class="char-stack char-stack--panik">
+          <img src="./images/パニっくん-焦り-512×512-透過.png" alt="パニっくん" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+          <p class="char-name">パニっくん</p>
+        </div>
+        <div class="char-bubble char-bubble--from-left flex-1">
+          <p class="bubble-body">ちょ、待ってください。Notionのデータを元にウェブページが自動で作られるんですか？誰もHTMLを手で書いてないのに？</p>
+        </div>
+      </div>
+
+      <div class="flex flex-row-reverse items-start gap-4 mb-8">
+        <div class="char-stack char-stack--upa">
+          <img src="./images/ウパ博士-諭す-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+          <p class="char-name">ウパ博士</p>
+        </div>
+        <div class="char-bubble char-bubble--from-right flex-1">
+          <p class="bubble-body">そうです。<span class="bubble-key">「どんなHTMLを生成するか」というテンプレートはプログラムの中に書かれていて、タスクの内容だけが毎回入れ替わります。</span>料理に例えると、レシピは固定で、食材だけが毎朝Notionから届くイメージですね。</p>
+        </div>
+      </div>
+
+      <h3 class="body-sub-heading" id="sec-ch3-screenshot">④ スクリーンショットを撮影（take-screenshot.js）</h3>
+
+      <div class="flex flex-row-reverse items-start gap-4 mb-8">
+        <div class="char-stack char-stack--upa">
+          <img src="./images/ウパ博士-標準-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+          <p class="char-name">ウパ博士</p>
+        </div>
+        <div class="char-bubble char-bubble--from-right flex-1">
+          <p class="bubble-body">③で作ったHTMLをSlackに直接貼ってもきれいに表示されませんよね。なので④では<span class="bubble-ui">Playwright</span>——<span class="bubble-key">目に見えない「幽霊ブラウザ」</span>——が自動でHTMLを開いて、3つのエリアに分けてスクリーンショットを撮ります。<br><br>具体的には「緊急アラート＋タスク一覧」「AI提案」「カレンダー＋凡例」の3枚です。</p>
+        </div>
+      </div>
+
+      <div class="flex items-start gap-4 mb-8">
+        <div class="char-stack char-stack--panik">
+          <img src="./images/パニっくん-マジ？-512×512-透過.png" alt="パニっくん" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+          <p class="char-name">パニっくん</p>
+        </div>
+        <div class="char-bubble char-bubble--from-left flex-1">
+          <p class="bubble-body">マジ？「幽霊ブラウザ」が自動でウェブページを開いてスクリーンショット撮ってくれるって、もはや小人が住んでるじゃないですか！</p>
+        </div>
+      </div>
+
+      <div class="flex flex-row-reverse items-start gap-4 mb-8">
+        <div class="char-stack char-stack--upa">
+          <img src="./images/ウパ博士-真顔-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+          <p class="char-name">ウパ博士</p>
+        </div>
+        <div class="char-bubble char-bubble--from-right flex-1">
+          <p class="bubble-body">……まあ、そういうイメージでも間違ってはないですよ。この「幽霊ブラウザ」はPlaywrightというGoogle系の技術で、Web上の操作を自動化するために作られています。画面はどこにも表示されませんが、裏でしっかり動いていますよ。</p>
+        </div>
+      </div>
+
+      <h3 class="body-sub-heading" id="sec-ch3-slack">⑤ Slackへ投稿（post-to-slack.js）</h3>
+
+      <div class="flex flex-row-reverse items-start gap-4 mb-8">
+        <div class="char-stack char-stack--upa">
+          <img src="./images/ウパ博士-標準-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+          <p class="char-name">ウパ博士</p>
+        </div>
+        <div class="char-bubble char-bubble--from-right flex-1">
+          <p class="bubble-body">最後のステップです。④で撮った3枚の画像を、<span class="bubble-ui">Slack Web API</span>を通じて指定したチャンネルに投稿します。<span class="bubble-key">「@channel おはようございます！本日のAIローンチ進捗ダッシュボードをお届けします」</span>という一言コメント付きで、3枚の画像がまとめて届きます。</p>
+        </div>
+      </div>
+
+      <div class="flex items-start gap-4 mb-8">
+        <div class="char-stack char-stack--panik">
+          <img src="./images/パニっくん-調子に乗ってる-512×512-透過.png" alt="パニっくん" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+          <p class="char-name">パニっくん</p>
+        </div>
+        <div class="char-bubble char-bubble--from-left flex-1">
+          <p class="bubble-body">すごい！！Notionのデータが5つの処理を通って、最終的にSlackの画像になるんですね。ベルトコンベアの例えがすごくわかりやすかったです！</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 第4章 -->
+    <h2 class="body-chapter-heading" id="sec-ch4">第4章：全部つなぐ「自動スケジューラー」</h2>
+    <section class="section-card">
+      <div class="flex items-start gap-4 mb-8">
+        <div class="char-stack char-stack--panik">
+          <img src="./images/パニっくん-焦り-512×512-透過.png" alt="パニっくん" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+          <p class="char-name">パニっくん</p>
+        </div>
+        <div class="char-bubble char-bubble--from-left flex-1">
+          <p class="bubble-body">でも博士、①〜⑤のステップを「毎日決まった時間に動かす」には、誰かがボタンを押す必要があるんじゃ……？</p>
+        </div>
+      </div>
+
+      <div class="flex flex-row-reverse items-start gap-4 mb-8">
+        <div class="char-stack char-stack--upa">
+          <img src="./images/ウパ博士-諭す-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+          <p class="char-name">ウパ博士</p>
+        </div>
+        <div class="char-bubble char-bubble--from-right flex-1">
+          <p class="bubble-body">鋭いですね。それを担っているのが<span class="bubble-ui">GitHub Actions</span>——<span class="bubble-key">インターネット上にある「タイマー付きの実行係」</span>です。<br><br>コードの保管場所（GitHubリポジトリ）に設定ファイルを1つ置くだけで、「毎日UTC20:00（日本時間の翌朝5時）に①〜⑤を順番に実行してください」というスケジュールを組めます。</p>
+        </div>
+      </div>
+
+      <div class="flex items-start gap-4 mb-8">
+        <div class="char-stack char-stack--panik">
+          <img src="./images/パニっくん-驚き-512×512-透過.png" alt="パニっくん" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+          <p class="char-name">パニっくん</p>
+        </div>
+        <div class="char-bubble char-bubble--from-left flex-1">
+          <p class="bubble-body">パソコンを起動しておく必要もなく、誰かが手動でやる必要もなく、インターネット上のサービスが勝手に動いてくれるってことですか！？</p>
+        </div>
+      </div>
+
+      <div class="flex flex-row-reverse items-start gap-4 mb-8">
+        <div class="char-stack char-stack--upa">
+          <img src="./images/ウパ博士-標準-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+          <p class="char-name">ウパ博士</p>
+        </div>
+        <div class="char-bubble char-bubble--from-right flex-1">
+          <div class="bubble-body">
+            <p>はい。GitHub Actionsの設定ファイルには、次のことが書かれています。</p>
+            <ol class="bubble-step-ol">
+              <li>いつ動くか：毎日UTC20:00（日本時間の翌朝5時）、または手動でも起動可能</li>
+              <li>何を使うか：Node.js 20 と Playwright（幽霊ブラウザ）</li>
+              <li>どのAPIキーを使うか：Notion・Gemini・Slackの鍵（GitHub Secretsで安全に管理）</li>
+              <li>何を実行するか：<span class="bubble-key">npm run run-all</span>（①〜⑤を一気に走らせるコマンド）</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-start gap-4 mb-8">
+        <div class="char-stack char-stack--panik">
+          <img src="./images/パニっくん-疑っている-512×512-透過.png" alt="パニっくん" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+          <p class="char-name">パニっくん</p>
+        </div>
+        <div class="char-bubble char-bubble--from-left flex-1">
+          <p class="bubble-body">「APIキーって何ですか？鍵って……Notionに鍵があるってこと？</p>
+        </div>
+      </div>
+
+      <div class="flex flex-row-reverse items-start gap-4 mb-8">
+        <div class="char-stack char-stack--upa">
+          <img src="./images/ウパ博士-諭す-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+          <p class="char-name">ウパ博士</p>
+        </div>
+        <div class="char-bubble char-bubble--from-right flex-1">
+          <p class="bubble-body">そうです。プログラムがNotionやSlackにアクセスするときは、「このプログラムは許可された本物ですよ」と証明するための<span class="bubble-key">合言葉のような文字列</span>が必要です。これが「APIキー」です。<br><br>漏れると第三者に悪用されるので、GitHubのSecrets（金庫）に安全に保管して、実行時だけ取り出す仕組みになっています。</p>
+        </div>
+      </div>
+
+      <div class="flex items-start gap-4 mb-8">
+        <div class="char-stack char-stack--panik">
+          <img src="./images/パニっくん-調子に乗ってる-512×512-透過.png" alt="パニっくん" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+          <p class="char-name">パニっくん</p>
+        </div>
+        <div class="char-bubble char-bubble--from-left flex-1">
+          <p class="bubble-body">なるほど！合言葉を金庫に入れておいて、必要な時だけ出すんですね。セキュリティもちゃんと考えられてる！</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 第5章 -->
+    <h2 class="body-chapter-heading" id="sec-ch5">第5章：まとめ — 全体の流れをもう一度</h2>
+    <section class="section-card">
+      <div class="flex flex-row-reverse items-start gap-4 mb-8">
+        <div class="char-stack char-stack--upa">
+          <img src="./images/ウパ博士-思考、分析-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+          <p class="char-name">ウパ博士</p>
+        </div>
+        <div class="char-bubble char-bubble--from-right flex-1">
+          <p class="bubble-body">では全体の流れを整理しましょう。</p>
+        </div>
+      </div>
+
+      <div class="script-list" aria-label="全体の流れまとめ">
+        <div class="script-list-title">
+          <i data-lucide="arrow-right-circle" class="w-4 h-4 text-[var(--brand-primary)]"></i>
+          ai-launch-dashboard の全体フロー
+        </div>
+        <ol>
+          <li><span class="bubble-ui">毎日UTC20:00</span> — GitHub Actionsのタイマーが発動</li>
+          <li><span class="bubble-ui">① Notionから取得</span> — タスク一覧をAPIで収集 → <code>notion-data.json</code>に保存</li>
+          <li><span class="bubble-ui">② Geminiで分析</span> — タスク状況を渡してAI提案を生成 → <code>ai-suggestions.json</code>に保存</li>
+          <li><span class="bubble-ui">③ HTML生成</span> — 2つのJSONを合成してダッシュボードHTMLを作成 → <code>dashboard.html</code></li>
+          <li><span class="bubble-ui">④ スクリーンショット</span> — Playwright（幽霊ブラウザ）が3枚の画像を撮影 → <code>screenshot-1〜3.png</code></li>
+          <li><span class="bubble-ui">⑤ Slack投稿</span> — 3枚の画像＋コメントを指定チャンネルに自動送信</li>
+        </ol>
+      </div>
+
+      <div class="flex items-start gap-4 mb-8">
+        <div class="char-stack char-stack--panik">
+          <img src="./images/パニっくん-涙ぐむ-512×512-透過.png" alt="パニっくん" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+          <p class="char-name">パニっくん</p>
+        </div>
+        <div class="char-bubble char-bubble--from-left flex-1">
+          <p class="bubble-body">博士……これって、毎朝ボクがやってたことを全部自動でやってくれるってことじゃないですか。「Notionを開いて確認して、まとめてSlackに報告する」——全部。感動して泣きそうになってきました……。</p>
+        </div>
+      </div>
+
+      <div class="flex flex-row-reverse items-start gap-4 mb-0">
+        <div class="char-stack char-stack--upa">
+          <img src="./images/ウパ博士-諭す-512×512-透過.png" alt="ウパ博士" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+          <p class="char-name">ウパ博士</p>
+        </div>
+        <div class="char-bubble char-bubble--from-right flex-1">
+          <p class="bubble-body">ふふ、そうですよ。しくみ自体はシンプルです。<span class="bubble-key">「データを取得 → AIが分析 → 見た目を作る → 画像に変換 → 送信」</span>という5つの処理が、ベルトコンベアのようにつながって動いている。それが ai-launch-dashboard の正体です。<br><br>大事なのは、それぞれのステップが<span class="bubble-key">「前のステップの出力を受け取って、次のステップへ渡す」</span>というシンプルな約束で動いていること。この考え方を押さえれば、似たしくみを自分で作ることもできますよ。</p>
+        </div>
+      </div>
+
+      <div class="flex items-start gap-4 mb-8 mt-8">
+        <div class="char-stack char-stack--panik">
+          <img src="./images/パニっくん-調子に乗ってる-512×512-透過.png" alt="パニっくん" class="char-avatar" width="80" height="80" loading="lazy" decoding="async">
+          <p class="char-name">パニっくん</p>
+        </div>
+        <div class="char-bubble char-bubble--from-left flex-1">
+          <p class="bubble-body">「前の出力が次の入力」！これ覚えます！！自分のタスク管理にも応用できそうな気がしてきた！！</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 利用条件・著作権（条文・構造の正本: diagram-upa/references/legal-footer-snippet.html） -->
+  <footer class="layout-column px-4 pb-10 md:pb-12" role="contentinfo" aria-label="利用条件・著作権">
+    <div class="section-card text-xs md:text-sm text-slate-600 leading-relaxed space-y-3">
+      <h2 class="text-sm font-bold text-slate-800 m-0">利用条件・著作権</h2>
+      <p class="m-0 text-[0.8125rem] text-slate-500">最終更新：2026年4月12日</p>
+      <p class="m-0">本資料（文章・構成・レイアウト・デザイン・画像・HTML/CSS/JavaScript を含みます。以下「本資料」）は、著作者・著作権者である個人事業主<strong class="text-slate-800">佐藤大生</strong>（発信名「ウパ博士」）の著作物です。<strong class="text-slate-800">本条件で明示的に許諾されない複製・改変・再配布は、原則として禁じます。</strong></p>
+      <p class="m-0"><strong class="text-slate-800">法令との関係：</strong>著作権法その他の法令により認められる私的利用・適法な引用その他の利用は、法令の定めるところにより妨げられません。引用や要約の紹介を行う場合は、<strong class="text-slate-800">著作者名・発信名の表示</strong>および<strong class="text-slate-800"><a href="https://ai-launch-dashboard-apr2026.surge.sh/" class="text-[var(--brand-secondary)] underline font-semibold hover:opacity-90">この資料の公式配布ページ</a>へのリンク</strong>を、同一の画面・投稿内で可能な範囲で併記してください。可否が判断しづらい場合は、事前に配布元へお問い合わせください。</p>
+      <p class="m-0"><strong class="text-slate-800">同意：</strong>本資料を閲覧・保存し、または複製・共有その他の利用を開始した時点で、当該時点で掲示されている本条件に同意したものとみなします。</p>
+      <p class="m-0 font-semibold text-slate-700">許諾される利用（いずれも無償・個別の書面許諾は不要）</p>
+      <ul class="m-0 pl-5 list-disc space-y-1.5">
+        <li>個人の学習目的での閲覧・印刷（私的利用の範囲内）</li>
+        <li><strong class="text-slate-800">同一の法人または同一の団体</strong>（学校・NPO 等）の構成員が、当該法人・団体の<strong class="text-slate-800">内部の業務・学習</strong>のために行う共有（<strong class="text-slate-800">ファイル内容を改変しないこと</strong>、および著作者の表示・本注意書きを残すことを条件とします）。<strong class="text-slate-800">別人格の法人</strong>（関連会社・グループ会社等）へのファイルのそのままの転送は、本条の「同一団体内の共有」には含まれません。必要な場合は、相手先の担当者へ<strong class="text-slate-800">公式配布ページ</strong>を案内してください。</li>
+        <li><strong class="text-slate-800">改変</strong>とは、文章・図表・デザイン・コードの<strong class="text-slate-800">内容を変更・削除・加工すること</strong>を指します。ファイル形式の変換や圧縮で<strong class="text-slate-800">表現内容が実質同一</strong>に保たれる場合は改変に含めません。変換後のファイルを第三者へ渡す行為は、別途「再配布」に関する条件に従います。</li>
+        <li>SNS・ブログ・メルマガ等で紹介する場合：<strong class="text-slate-800"><a href="https://ai-launch-dashboard-apr2026.surge.sh/" class="text-[var(--brand-secondary)] underline font-semibold hover:opacity-90">この資料の公式配布ページ</a>へのリンク</strong>を、第三者が著作者・出典を誤認しないよう<strong class="text-slate-800">明確に表示すること</strong>を条件に、紹介・シェアを認めます。掲載プラットフォームの仕様でリンクが不可のときは、プロフィール・固定投稿等に置ける<strong class="text-slate-800">公式URLの明示</strong>と<strong class="text-slate-800">著作者名・発信名・資料名</strong>の表示で代替できます（可能な限り同一画面内にリンクを掲載してください）。</li>
+        <li>画面キャプチャや動画の一部などで本資料の見た目を示す場合も、上記と同様に<strong class="text-slate-800">出典が分かる表示</strong>および<strong class="text-slate-800">公式配布ページへの導線</strong>（リンクまたは上記代替）を併記してください。</li>
+      </ul>
+      <p class="m-0 font-semibold text-slate-700">禁止事項（違反が判明した場合、法令に基づき差止め・損害賠償の請求その他必要な対応を行うことがあります）</p>
+      <ul class="m-0 pl-5 list-disc space-y-1.5">
+        <li><strong class="text-slate-800">本資料の内容を変更する改変、翻案、第三者への抜粋・要約文の再配布（適法な引用の範囲を超えるもの）、他コンテンツとの不当な合成</strong>（表現の軽微な修正、意図的なデザイン・レイアウトの変更、ロゴ・キャラクター画像の切り出し等を含みます）</li>
+        <li><strong class="text-slate-800">本資料（または実質同一の複製・改変物）を対価（金銭・ポイント等）と交換に提供すること、商用ライセンスの付与、有料講座・教材・テンプレート等の「主たる教材コンテンツ」としての組み込み。</strong>ただし、<strong class="text-slate-800">本資料のファイルを販売・頒布の対象としない</strong>無償の勉強会・社内説明・紹介投稿などで、講師謝礼や会場費のみが発生する程度の場合は、この限りではありません（参加者へファイルを一括配布する場合は、上記「同一団体内の共有」または公式ページ案内に従ってください）。</li>
+        <li>著作者名・本注意書き・出典情報の削除、または第三者の著作物・サービスであると誤認させる表示</li>
+        <li>公式配布ページへのリンク（または上記に定める代替表示）を果たさないままの紹介・転載・ファイルの再配布</li>
+        <li>本注意書きに同意できない形での利用</li>
+      </ul>
+      <p class="m-0 font-semibold text-slate-700">お問い合わせ</p>
+      <p class="m-0">商用利用・二次利用の可否、引用の事前確認などは、<strong class="text-slate-800">配布元で案内している連絡先</strong>（メール・フォーム等）までお願いします。連絡先が掲示されていない場合は、発信チャンネル（SNS 等）のダイレクトメッセージ等でご連絡ください。</p>
+      <p class="m-0 font-semibold text-slate-700">第三者の素材・商標</p>
+      <p class="m-0">本資料が参照する Web フォント、スクリプト（CDN 経由を含む）、アイコン等は、各権利者の利用条件に従います。</p>
+      <p class="m-0">本資料に掲載する各社のソフトウェア・サービスの画面キャプチャ、ロゴ、および記載の製品名・サービス名は、それぞれ各権利者に帰属します。掲載は説明・紹介を目的とするものであり、当該権利者の公式見解や推認を意味するものではありません。各社の商標表示ガイドライン、利用規約等に従ってください。</p>
+      <p class="m-0 font-semibold text-slate-700">免責</p>
+      <p class="m-0">本資料の内容は、作成時点の情報に基づくものであり、正確性・完全性・最新性を保証するものではありません。利用により生じたいかなる損害についても、法令上認められる範囲を除き著作者・著作権者は責任を負いません。</p>
+      <p class="m-0 font-semibold text-slate-700">準拠法</p>
+      <p class="m-0">本条件の準拠法は<strong class="text-slate-800">日本法</strong>とします。訴訟の必要が生じた場合、著作者・著作権者の住所地を管轄する地方裁判所を第一審の合意管轄裁判所とします。</p>
+      <p class="m-0 pt-3 mt-1 border-t border-slate-200/90 text-slate-500 text-[0.8125rem] leading-relaxed">本条件にご同意いただけない場合は、本資料の利用（閲覧・保存・複製・共有等）を開始しないでください。本条件は<strong class="text-slate-700">変更後の版が本ページに掲示された日以降に開始する利用</strong>に適用されます。それ以前に入手したファイルについては、入手時点の条件に従い、本条で許諾された範囲の私的利用・共有を継続できます。</p>
+    </div>
+  </footer>
+
+  <style>
+    /**
+     * 吹き出し（対話）
+     * - Tailwind CDN は実行時に <style> を挿入するため、同じ <head> 内のルールより後に勝つことがある。
+     * - ここを </body> 直前に置き、.slack-daily-page でスコープして確実に適用する。
+     * - しっぽは上寄り（1行目付近）。白＋細い中立ボーダーがしっぽまで続くよう二重三角。
+     * - キャラは透過PNGのため背景色は敷かず、drop-shadow のみで地からわずかに浮かせる。
+     * - キャラ名は画像直下に実テキストで表示（中央寄せ・小さめのグレー）。
+     */
+    body.slack-daily-page {
+      background: linear-gradient(
+        165deg,
+        hsl(192, 62%, 97%) 0%,
+        hsl(196, 52%, 95.5%) 45%,
+        hsl(200, 46%, 94%) 100%
+      ) !important;
+      background-attachment: fixed;
+    }
+    .slack-daily-page .char-stack {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-shrink: 0;
+      width: 4.75rem;
+    }
+    .slack-daily-page .char-name {
+      margin: 0.2rem 0 0;
+      padding: 0;
+      font-size: 0.6875rem;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      color: hsl(210, 11%, 42%);
+      text-align: center;
+      line-height: 1.25;
+      max-width: 5rem;
+    }
+    .slack-daily-page .char-avatar {
+      width: 4rem;
+      height: 4rem;
+      object-fit: contain;
+      flex-shrink: 0;
+      margin-top: 0.15rem;
+      background: transparent;
+      border: none;
+      padding: 0;
+      border-radius: 0;
+      box-shadow: none;
+      filter: drop-shadow(0 2px 6px rgba(15, 23, 42, 0.08));
+    }
+    @media (min-width: 768px) {
+      .slack-daily-page .char-avatar {
+        width: 5rem;
+        height: 5rem;
+      }
+    }
+    .slack-daily-page .char-bubble {
+      position: relative;
+      padding: 1.05rem 1.15rem;
+      border-radius: 1.125rem;
+      background: var(--surface-bg);
+      border: 1px solid #d1d9e0;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+      overflow: visible;
+    }
+    .slack-daily-page .char-bubble--from-left { margin-left: 0.65rem; }
+    .slack-daily-page .char-bubble--from-right { margin-right: 0.65rem; }
+    .slack-daily-page .char-bubble--from-left::before,
+    .slack-daily-page .char-bubble--from-left::after,
+    .slack-daily-page .char-bubble--from-right::before,
+    .slack-daily-page .char-bubble--from-right::after {
+      content: '';
+      position: absolute;
+      top: 1.125rem;
+      width: 0;
+      height: 0;
+      border-style: solid;
+      pointer-events: none;
+    }
+    .slack-daily-page .char-bubble--from-left::before {
+      left: -12px;
+      border-width: 9px 11px 9px 0;
+      border-color: transparent #d1d9e0 transparent transparent;
+    }
+    .slack-daily-page .char-bubble--from-left::after {
+      left: -10px;
+      border-width: 8px 10px 8px 0;
+      border-color: transparent var(--surface-bg) transparent transparent;
+      z-index: 1;
+    }
+    .slack-daily-page .char-bubble--from-right::before {
+      right: -12px;
+      left: auto;
+      border-width: 9px 0 9px 11px;
+      border-color: transparent transparent transparent #d1d9e0;
+    }
+    .slack-daily-page .char-bubble--from-right::after {
+      right: -10px;
+      left: auto;
+      border-width: 8px 0 8px 10px;
+      border-color: transparent transparent transparent var(--surface-bg);
+      z-index: 1;
+    }
+  </style>
+  <script>
+    lucide.createIcons();
+  </script>
+</body>
+</html>
